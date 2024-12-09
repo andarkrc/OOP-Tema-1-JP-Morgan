@@ -6,6 +6,7 @@ import org.poo.jsonobject.JsonArray;
 import org.poo.jsonobject.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Getter
 @Setter
@@ -15,10 +16,12 @@ public abstract class Account implements Visitable{
     protected double balance;
     protected String IBAN;
     protected ArrayList<Card> cards;
+    protected HashMap<String, Card> cardsMap;
 
     public Account() {
         balance = 0;
         cards = new ArrayList<>();
+        cardsMap = new HashMap<>();
     }
 
     public JsonArray acceptJsonArray(Visitor visitor) {
@@ -35,6 +38,12 @@ public abstract class Account implements Visitable{
 
     public void addCard(Card card) {
         cards.add(card);
+        cardsMap.put(card.getNumber(), card);
+    }
+
+    public void removeCard(String cardNumber) {
+        cards.remove(cardsMap.get(cardNumber));
+        cardsMap.remove(cardNumber);
     }
 
     public Account setCurrency(String currency) {

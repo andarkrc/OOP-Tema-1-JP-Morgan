@@ -40,6 +40,24 @@ public class DatabaseEntry implements Visitable {
         accountMap.put(account.getIBAN(), account);
     }
 
+    public void removeAccount(String IBAN) {
+        accounts.remove(accountMap.get(IBAN));
+        accountMap.remove(IBAN);
+    }
+
+    public void addCard(String IBAN, Card card) {
+        Account account = getAccount(IBAN);
+        account.addCard(card);
+        accountMap.put(card.getNumber(), account);
+    }
+
+    public void removeCard(String cardNumber) {
+        Account account = getAccount(cardNumber);
+        account.removeCard(cardNumber);
+        accountMap.remove(cardNumber);
+
+    }
+
     public void addTransaction(Transaction transaction) {
         transactionHistory.add(transaction);
     }

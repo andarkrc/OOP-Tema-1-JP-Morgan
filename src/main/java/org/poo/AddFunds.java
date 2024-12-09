@@ -14,19 +14,28 @@ public class AddFunds extends DefaultTransaction {
         amount = input.getAmount();
     }
 
-    public void execute() {
-        if (bank.getAccount(IBAN) != null) {
-            bank.getAccount(IBAN).addFunds(amount);
-        } else {
+    private boolean verify() {
+        if (!bank.databaseHas(IBAN)) {
             System.out.println("Account not found");
+            return false;
         }
+        return true;
+    }
+
+    public void execute() {
+        if (!verify()) {
+            return;
+        }
+
+        bank.getAccount(IBAN).addFunds(amount);
     }
 
     public void remember() {
-        if (bank.getEntryOfIBAN(IBAN) != null) {
-            bank.getEntryOfIBAN(IBAN).addTransaction(this);
-        } else {
-            System.out.println("User not found");
+        if (!verify()) {
+            return;
         }
+
+        DatabaseEntry entry = bank.getEntryWithIBAN(IBAN);
+        bank.addTransaction(entry.getUser().getEmail(), this);
     }
 }

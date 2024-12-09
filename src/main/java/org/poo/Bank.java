@@ -26,21 +26,49 @@ public class Bank implements Visitable{
         return null;
     }
 
+    public boolean databaseHas(String key) {
+        return database.hasKey(key);
+    }
+
     public void addUser(UserInput input) {
         database.addUser(new User(input));
     }
 
-    public DatabaseEntry getEntryOfEmail(String email) {
-        return database.getEmailDatabase().get(email);
+    public void addAccount(String email, Account account) {
+        database.addAccount(email, account);
     }
 
-    public DatabaseEntry getEntryOfIBAN(String IBAN) {
-        return database.getIBANDatabase().get(IBAN);
+    public void removeAccount(String IBAN) {
+        database.removeAccount(IBAN);
+    }
+
+    public void addCard(String IBAN, Card card) {
+        database.addCard(IBAN, card);
+    }
+
+    public void removeCard(String cardNumber) {
+        database.removeCard(cardNumber);
+    }
+
+    public void addTransaction(String email, Transaction transaction) {
+        database.addTransaction(email, transaction);
+    }
+
+    public DatabaseEntry getEntryWithEmail(String email) {
+        return database.getEntriesMap().get(email);
+    }
+
+    public DatabaseEntry getEntryWithIBAN(String IBAN) {
+        return database.getEntriesMap().get(IBAN);
+    }
+
+    public DatabaseEntry getEntryWithCard(String cardNumber) {
+        return database.getEntriesMap().get(cardNumber);
     }
 
     public Account getAccount(String IBAN) {
-        if (database.getIBANDatabase().get(IBAN) != null) {
-            return database.getIBANDatabase().get(IBAN).getAccount(IBAN);
+        if (database.getEntriesMap().containsKey(IBAN)) {
+            return database.getEntriesMap().get(IBAN).getAccount(IBAN);
         }
         return null;
     }

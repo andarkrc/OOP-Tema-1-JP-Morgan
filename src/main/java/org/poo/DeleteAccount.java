@@ -13,12 +13,28 @@ public class DeleteAccount extends DefaultTransaction {
         email = input.getEmail();
     }
 
+    private boolean verify() {
+        if (!bank.databaseHas(email)) {
+            System.out.println("User does not exist");
+            return false;
+        }
+        if (!bank.databaseHas(IBAN)) {
+            System.out.println("Account does not exist");
+            return false;
+        }
+        if (bank.getEntryWithEmail(email) != bank.getEntryWithIBAN(IBAN)) {
+            System.out.println("User does not own account");
+            return false;
+        }
+        return true;
+    }
+
     public void execute() {
-        DatabaseEntry entry = bank.getEntryOfEmail(email);
-        Account account = bank.getAccount(IBAN);
-        entry.getAccounts().remove(account);
-        entry.getAccountMap().remove(IBAN);
-        bank.getDatabase().getIBANDatabase().remove(IBAN);
+        if (!verify()) {
+            return;
+        }
+
+        bank.removeAccount(IBAN);
 
         JsonObject status = new JsonObject();
         JsonObject output = new JsonObject();
@@ -31,6 +47,10 @@ public class DeleteAccount extends DefaultTransaction {
     }
 
     public void remember() {
-        bank.getEntryOfEmail(email).addTransaction(this);
+        if (!verify()) {
+            return;
+        }
+
+        bank.addTransaction(email, this);
     }
 }

@@ -21,6 +21,14 @@ public abstract class TransactionFactory {
                 return new CreateNormalCard(input, bank);
             }
 
+            case "createOneTimeCard" -> {
+                return new CreateOneTimeCard(input, bank);
+            }
+
+            case "deleteCard" -> {
+                return new DeleteCard(input, bank);
+            }
+
             case "printUsers" -> {
                 return new PrintUsers(input, bank);
             }

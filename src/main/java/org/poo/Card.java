@@ -9,20 +9,11 @@ import org.poo.jsonobject.JsonObject;
 public abstract class Card implements Visitable{
     protected String number;
     protected String status;
+    protected String type;
 
     public Card(String number) {
         this.number = number;
         this.status = "active";
-    }
-
-    public Card setStatus(String status) {
-        this.status = status;
-        return this;
-    }
-
-    public Card setNumber(String number) {
-        this.number = number;
-        return this;
     }
 
     public JsonArray acceptJsonArray(Visitor visitor) {

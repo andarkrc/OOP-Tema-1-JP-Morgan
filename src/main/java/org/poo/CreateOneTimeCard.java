@@ -3,8 +3,8 @@ package org.poo;
 import org.poo.fileio.CommandInput;
 import org.poo.utils.Utils;
 
-public class CreateNormalCard extends CreateCard {
-    public CreateNormalCard(CommandInput input, Bank bank) {
+public class CreateOneTimeCard extends CreateCard {
+    public CreateOneTimeCard(CommandInput input, Bank bank) {
         super(input, bank);
     }
 
@@ -13,7 +13,7 @@ public class CreateNormalCard extends CreateCard {
             return;
         }
 
-        Card card = new NormalCard(Utils.generateCardNumber());
+        Card card = new OneTimeCard(Utils.generateCardNumber());
 
         bank.addCard(IBAN, card);
     }
