@@ -3,11 +3,19 @@ package org.poo.main;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.Bank;
+import org.poo.Transaction;
+import org.poo.TransactionFactory;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
+import org.poo.fileio.CommandInput;
 import org.poo.fileio.ObjectInput;
+import org.poo.fileio.UserInput;
+import org.poo.jsonobject.JsonArray;
+import org.poo.utils.Utils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,29 +80,31 @@ public final class Main {
         File file = new File(CheckerConstants.TESTS_PATH + filePath1);
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
 
-        ArrayNode output = objectMapper.createArrayNode();
+        JsonArray output = new JsonArray();
+        System.out.println("Test" + filePath1);
+        Bank bank = Bank.getInstance();
+        bank.init();
+        bank.setOutput(output);
+        Utils.resetRandom();
 
-        /*
-         * TODO Implement your function here
-         *
-         * How to add output to the output array?
-         * There are multiple ways to do this, here is one example:
-         *
-         * ObjectMapper mapper = new ObjectMapper();
-         *
-         * ObjectNode objectNode = mapper.createObjectNode();
-         * objectNode.put("field_name", "field_value");
-         *
-         * ArrayNode arrayNode = mapper.createArrayNode();
-         * arrayNode.add(objectNode);
-         *
-         * output.add(arrayNode);
-         * output.add(objectNode);
-         *
-         */
+        for (UserInput user : inputData.getUsers()) {
+            bank.addUser(user);
+        }
 
-        ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-        objectWriter.writeValue(new File(filePath2), output);
+        for (CommandInput command : inputData.getCommands()) {
+            Transaction transaction = TransactionFactory.transactionBuild(command, bank);
+            if (transaction == null) {
+                System.out.println("Unknown command: " + command.getCommand());
+                continue;
+            }
+            transaction.execute();
+            transaction.remember();
+        }
+
+
+        FileWriter outFile = new FileWriter(filePath2);
+        outFile.write(output.finalizeData());
+        outFile.close();
     }
 
     /**
