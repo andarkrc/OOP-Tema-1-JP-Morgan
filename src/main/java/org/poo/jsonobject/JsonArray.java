@@ -71,6 +71,20 @@ public final class JsonArray {
     }
 
     /**
+     * Adds a new String to the JSON Array.
+     * !!! No quotes are added to mark the string as string.
+     * !!! To be used for custom implementations.
+     *
+     * @param value     the new JsonArray added
+     */
+    public void addStringNoQuotes(final String value) {
+        if (!data.isEmpty()) {
+            data += ",\n";
+        }
+        data += value;
+    }
+
+    /**
      * Returns the data stored as a JSON Array.
      *
      * @return      a string representing the data stored in the JSON Array

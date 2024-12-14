@@ -13,19 +13,16 @@ import java.util.HashMap;
 public class DatabaseEntry implements Visitable {
     private User user;
     private ArrayList<Account> accounts;
-    private ArrayList<Transaction> transactionHistory;
+    private ArrayList<DefaultTransaction> transactionHistory;
     private HashMap<String, Account> accountMap;
+    private HashMap<String, String> aliases;
 
     public Account getAccount(String IBAN) {
         return accountMap.get(IBAN);
     }
 
-    public JsonObject acceptJsonObject(Visitor visitor) {
+    public String accept(Visitor visitor) {
         return visitor.visit(this);
-    }
-
-    public JsonArray acceptJsonArray(Visitor visitor) {
-        return null;
     }
 
     public DatabaseEntry(User user) {
@@ -33,6 +30,23 @@ public class DatabaseEntry implements Visitable {
         accounts = new ArrayList<>();
         transactionHistory = new ArrayList<>();
         accountMap = new HashMap<>();
+        aliases = new HashMap<>();
+    }
+
+    public void setAlias(String account, String alias) {
+        aliases.put(alias, account);
+    }
+
+    public void removeAlias(String alias) {
+        aliases.remove(alias);
+    }
+
+    public boolean hasAlias(String alias) {
+        return aliases.containsKey(alias);
+    }
+
+    public String getAlias(String alias) {
+        return aliases.get(alias);
     }
 
     public void addAccount(Account account) {
@@ -58,7 +72,7 @@ public class DatabaseEntry implements Visitable {
 
     }
 
-    public void addTransaction(Transaction transaction) {
+    public void addTransaction(DefaultTransaction transaction) {
         transactionHistory.add(transaction);
     }
 }

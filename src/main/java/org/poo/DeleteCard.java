@@ -13,24 +13,27 @@ public class DeleteCard extends DefaultTransaction{
         number = input.getCardNumber();
     }
 
-    private boolean verify() {
+    protected String verify() {
+        result = new JsonObject();
+        result.add("timestamp", timestamp);
         if (!bank.databaseHas(email)) {
-            System.out.println("User does not exist");
-            return false;
+            result.add("description", "User does not exist");
+            return "User does not exist";
         }
         if (!bank.databaseHas(number)) {
-            System.out.println("Card does not exist");
-            return false;
+            result.add("description", "Card does not exist");
+            return "Card does not exist";
         }
         if (bank.getEntryWithEmail(email) != bank.getEntryWithCard(number)) {
-            System.out.println("User does not card");
-            return false;
+            result.add("description", "User does not own card");
+            return "User does not own card";
         }
-        return true;
+        result.add("description", "ok");
+        return "ok";
     }
 
     public void execute() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
 
@@ -38,11 +41,23 @@ public class DeleteCard extends DefaultTransaction{
     }
 
     public void remember() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
 
         bank.addTransaction(email,this);
     }
 
+    public void burnDetails() {
+        if (!verify().equals("ok")) {
+            return;
+        }
+
+        details = new JsonObject();
+        details.add("cardHolder", email);
+        details.add("card", number);
+        details.add("account", bank.getAccountWithCard(number).getIBAN());
+        details.add("timestamp", timestamp);
+        details.add("description", "The card has been destroyed");
+    }
 }

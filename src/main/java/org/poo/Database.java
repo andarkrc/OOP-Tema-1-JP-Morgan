@@ -19,7 +19,7 @@ public class Database {
         return entriesMap.containsKey(key);
     }
 
-    public void addTransaction(String email, Transaction transaction) {
+    public void addTransaction(String email, DefaultTransaction transaction) {
         entriesMap.get(email).addTransaction(transaction);
     }
 

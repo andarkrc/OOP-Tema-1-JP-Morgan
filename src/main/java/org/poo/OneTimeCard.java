@@ -7,9 +7,4 @@ public class OneTimeCard extends Card {
         super(number);
         type = "one_time";
     }
-
-    @Override
-    public JsonObject acceptJsonObject(Visitor visitor) {
-        return visitor.visit(this);
-    }
 }

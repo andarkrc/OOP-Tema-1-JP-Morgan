@@ -7,9 +7,4 @@ public class NormalCard extends Card{
         super(cardNumber);
         type = "normal";
     }
-
-    @Override
-    public JsonObject acceptJsonObject(Visitor visitor) {
-        return visitor.visit(this);
-    }
 }

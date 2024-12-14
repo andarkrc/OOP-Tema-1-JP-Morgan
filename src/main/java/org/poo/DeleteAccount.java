@@ -13,33 +13,42 @@ public class DeleteAccount extends DefaultTransaction {
         email = input.getEmail();
     }
 
-    private boolean verify() {
+    protected String verify() {
+        result = new JsonObject();
+        result.add("timestamp", timestamp);
         if (!bank.databaseHas(email)) {
-            System.out.println("User does not exist");
-            return false;
+            result.add("description", "User does not exists");
+            return "User does not exist";
         }
         if (!bank.databaseHas(IBAN)) {
-            System.out.println("Account does not exist");
-            return false;
+            result.add("description", "Account does not exist");
+            return "Account does not exist";
         }
         if (bank.getEntryWithEmail(email) != bank.getEntryWithIBAN(IBAN)) {
-            System.out.println("User does not own account");
-            return false;
+            result.add("description", "User does not exist");
+            return "User does not own account";
         }
-        return true;
+
+        result.add("description", "ok");
+        return "ok";
     }
 
     public void execute() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
 
-        bank.removeAccount(IBAN);
+
+        JsonObject output = new JsonObject();
+        output.add("timestamp", timestamp);
+        if (Double.compare(0, bank.getAccountWithIBAN(IBAN).getBalance()) == 0) {
+            output.add("success", "Account deleted");
+            bank.removeAccount(IBAN);
+        } else {
+            output.add("error", "Account couldn't be deleted - see org.poo.transactions for details");
+        }
 
         JsonObject status = new JsonObject();
-        JsonObject output = new JsonObject();
-        output.add("success", "Account deleted");
-        output.add("timestamp", timestamp);
         status.add("command", "deleteAccount");
         status.add("output", output);
         status.add("timestamp", timestamp);
@@ -47,10 +56,9 @@ public class DeleteAccount extends DefaultTransaction {
     }
 
     public void remember() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
-
         bank.addTransaction(email, this);
     }
 }

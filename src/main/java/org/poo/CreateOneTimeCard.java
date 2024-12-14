@@ -9,20 +9,11 @@ public class CreateOneTimeCard extends CreateCard {
     }
 
     public void execute() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
 
-        Card card = new OneTimeCard(Utils.generateCardNumber());
-
+        Card card = new OneTimeCard(number);
         bank.addCard(IBAN, card);
-    }
-
-    public void remember() {
-        if (!verify()) {
-            return;
-        }
-
-        bank.addTransaction(email, this);
     }
 }

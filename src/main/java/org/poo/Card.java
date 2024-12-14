@@ -16,11 +16,7 @@ public abstract class Card implements Visitable{
         this.status = "active";
     }
 
-    public JsonArray acceptJsonArray(Visitor visitor) {
-        return null;
-    }
-
-    public JsonObject acceptJsonObject(Visitor visitor) {
-        return null;
+    public String accept(Visitor visitor) {
+        return visitor.visit(this);
     }
 }

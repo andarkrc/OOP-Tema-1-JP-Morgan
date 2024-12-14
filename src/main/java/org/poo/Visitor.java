@@ -4,8 +4,8 @@ import org.poo.jsonobject.JsonArray;
 import org.poo.jsonobject.JsonObject;
 
 public interface Visitor {
-    public JsonArray visit(Bank bank);
-    public JsonObject visit(DatabaseEntry user);
-    public JsonObject visit(Account account);
-    public JsonObject visit(Card card);
+    public String visit(DatabaseEntry dbEntry);
+    public String visit(Account account);
+    public String visit(Card card);
+    public String visit(DefaultTransaction transaction);
 }

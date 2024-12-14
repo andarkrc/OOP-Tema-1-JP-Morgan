@@ -1,11 +1,10 @@
 package org.poo;
 
 import org.poo.fileio.CommandInput;
-import org.poo.jsonobject.JsonObject;
 import org.poo.utils.Utils;
 
-public class AddClassicAccount extends AddAccount{
-    public AddClassicAccount(CommandInput input, Bank bank) {
+public class AddSavingsAccount extends AddAccount{
+    public AddSavingsAccount(CommandInput input, Bank bank) {
         super(input, bank);
     }
 
@@ -14,7 +13,7 @@ public class AddClassicAccount extends AddAccount{
             return;
         }
 
-        Account account = new ClassicAccount();
+        Account account = new SavingsAccount();
         account.setAccountType(accountType)
                 .setCurrency(currency)
                 .setIBAN(IBAN);

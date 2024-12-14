@@ -24,12 +24,12 @@ public abstract class Account implements Visitable{
         cardsMap = new HashMap<>();
     }
 
-    public JsonArray acceptJsonArray(Visitor visitor) {
-        return null;
+    public boolean isSavings() {
+        return false;
     }
 
-    public JsonObject acceptJsonObject(Visitor visitor) {
-        return null;
+    public String accept(Visitor visitor) {
+        return visitor.visit(this);
     }
 
     public void addFunds(double amount) {

@@ -9,20 +9,11 @@ public class CreateNormalCard extends CreateCard {
     }
 
     public void execute() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
 
-        Card card = new NormalCard(Utils.generateCardNumber());
-
+        Card card = new NormalCard(number);
         bank.addCard(IBAN, card);
-    }
-
-    public void remember() {
-        if (!verify()) {
-            return;
-        }
-
-        bank.addTransaction(email, this);
     }
 }

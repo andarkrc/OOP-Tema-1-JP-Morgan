@@ -3,9 +3,7 @@ package org.poo.main;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.poo.Bank;
-import org.poo.Transaction;
-import org.poo.TransactionFactory;
+import org.poo.*;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
 import org.poo.fileio.CommandInput;
@@ -83,7 +81,7 @@ public final class Main {
         JsonArray output = new JsonArray();
         System.out.println("Test" + filePath1);
         Bank bank = Bank.getInstance();
-        bank.init();
+        bank.init(inputData.getExchangeRates());
         bank.setOutput(output);
         Utils.resetRandom();
 
@@ -92,13 +90,17 @@ public final class Main {
         }
 
         for (CommandInput command : inputData.getCommands()) {
-            Transaction transaction = TransactionFactory.transactionBuild(command, bank);
+            DefaultTransaction transaction = TransactionFactory.transactionBuild(command, bank);
             if (transaction == null) {
                 System.out.println("Unknown command: " + command.getCommand());
                 continue;
             }
-            transaction.execute();
+            transaction.burnDetails();
             transaction.remember();
+            if (transaction.hasLoggableError()) {
+                output.addStringNoQuotes(transaction.accept(new JsonObjectVisitor()));
+            }
+            transaction.execute();
         }
 
 

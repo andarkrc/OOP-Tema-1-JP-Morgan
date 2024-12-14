@@ -123,6 +123,21 @@ public final class JsonObject {
     }
 
     /**
+     * Adds a new "field": String pair to the JSON object.
+     * !!! No quotes are added to mark the string as string.
+     * !!! To be used for custom implementations.
+     *
+     * @param field     name of the field
+     * @param value     value of the field
+     */
+    public void addStringNoQuotes(final String field, final String value) {
+        if (!data.isEmpty()) {
+            this.data += ",\n";
+        }
+        this.data += "\"" + field + "\": " + value;
+    }
+
+    /**
      * Returns the data stored as a JSON Object.
      *
      * @return      a string representing the data stored in the JSON Object

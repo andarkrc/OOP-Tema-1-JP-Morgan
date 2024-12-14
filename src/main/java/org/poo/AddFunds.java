@@ -1,6 +1,7 @@
 package org.poo;
 
 import org.poo.fileio.CommandInput;
+import org.poo.jsonobject.JsonObject;
 
 import java.math.BigDecimal;
 
@@ -14,28 +15,21 @@ public class AddFunds extends DefaultTransaction {
         amount = input.getAmount();
     }
 
-    private boolean verify() {
+    protected String verify() {
+        result = new JsonObject();
         if (!bank.databaseHas(IBAN)) {
-            System.out.println("Account not found");
-            return false;
+            result.add("description", "Account not found");
+            return "Account not found";
         }
-        return true;
+        result.add("description", "ok");
+        return "ok";
     }
 
     public void execute() {
-        if (!verify()) {
+        if (!verify().equals("ok")) {
             return;
         }
 
-        bank.getAccount(IBAN).addFunds(amount);
-    }
-
-    public void remember() {
-        if (!verify()) {
-            return;
-        }
-
-        DatabaseEntry entry = bank.getEntryWithIBAN(IBAN);
-        bank.addTransaction(entry.getUser().getEmail(), this);
+        bank.getAccountWithIBAN(IBAN).addFunds(amount);
     }
 }
