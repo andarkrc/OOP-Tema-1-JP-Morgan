@@ -69,6 +69,18 @@ public abstract class TransactionFactory {
                 return new CheckCardStatus(input, bank);
             }
 
+            case "changeInterestRate" -> {
+                return new ChangeInterestRate(input, bank);
+            }
+
+            case "splitPayment" -> {
+                return new SplitPayment(input, bank);
+            }
+
+            case "report" -> {
+                return new Report(input, bank);
+            }
+
             default -> {
                 return null;
             }

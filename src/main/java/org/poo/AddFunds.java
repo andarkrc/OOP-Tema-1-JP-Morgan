@@ -33,4 +33,8 @@ public class AddFunds extends DefaultTransaction {
 
         bank.getAccountWithIBAN(IBAN).addFunds(amount);
     }
+
+    public String getAccount() {
+        return IBAN;
+    }
 }

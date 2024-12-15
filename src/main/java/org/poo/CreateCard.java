@@ -56,4 +56,8 @@ public abstract class CreateCard extends DefaultTransaction{
         details.add("card", number);
         details.add("description", "New card created");
     }
+
+    public String getAccount() {
+        return IBAN;
+    }
 }

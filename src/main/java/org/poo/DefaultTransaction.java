@@ -53,4 +53,8 @@ public abstract class DefaultTransaction implements Visitable {
         details.add("command", commandName);
         details.add("timestamp", timestamp);
     }
+
+    public String getAccount() {
+        return "";
+    }
 }

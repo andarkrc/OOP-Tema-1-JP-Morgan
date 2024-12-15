@@ -11,6 +11,7 @@ public class PayOnline extends DefaultTransaction {
     private String description;
     private String commerciant;
     private String email;
+    private String IBAN;
 
     public PayOnline(CommandInput input, Bank bank) {
         super(input, bank);
@@ -57,6 +58,7 @@ public class PayOnline extends DefaultTransaction {
         }
 
         Account account = bank.getAccountWithCard(cardNumber);
+
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
         if (account.getBalance() >= actualAmount) {
             account.setBalance(account.getBalance() - actualAmount);
@@ -67,7 +69,7 @@ public class PayOnline extends DefaultTransaction {
         if (!verify().equals("ok")) {
             return;
         }
-
+        IBAN = bank.getAccountWithCard(cardNumber).getIBAN();
         bank.addTransaction(email, this);
     }
 
@@ -92,5 +94,9 @@ public class PayOnline extends DefaultTransaction {
             details.add("amount", actualAmount);
             details.add("commerciant", commerciant);
         }
+    }
+
+    public String getAccount() {
+        return IBAN;
     }
 }

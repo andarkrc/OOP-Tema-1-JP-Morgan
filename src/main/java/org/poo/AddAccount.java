@@ -42,4 +42,8 @@ public abstract class AddAccount extends DefaultTransaction {
         }
         bank.addTransaction(email, this);
     }
+
+    public String getAccount() {
+        return IBAN;
+    }
 }

@@ -2,10 +2,13 @@ package org.poo;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.UserInput;
 import org.poo.jsonobject.JsonArray;
 import org.poo.jsonobject.JsonObject;
+
+import java.util.List;
 
 public class Bank {
     private static Bank instance = null;
@@ -149,9 +152,9 @@ public class Bank {
         return instance;
     }
 
-    public void init(ExchangeInput[] input) {
+    public void init(ExchangeInput[] rates) {
         database = new Database();
         exchange = CurrencyExchange.getInstance();
-        exchange.init(input);
+        exchange.init(rates);
     }
 }

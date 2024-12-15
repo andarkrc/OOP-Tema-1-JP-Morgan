@@ -96,4 +96,8 @@ public class SendMoney extends DefaultTransaction{
             details.add("description", "Insufficient funds");
         }
     }
+
+    public String getAccount() {
+        return account;
+    }
 }
