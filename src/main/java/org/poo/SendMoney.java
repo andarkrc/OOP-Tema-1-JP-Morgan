@@ -48,16 +48,8 @@ public class SendMoney extends DefaultTransaction{
             result.add("description", "Sender account does not belong to this account");
             return "Sender account does not belong to this account";
         }
-        if (bank.getAccountWithIBAN(account, email).getBalance() < amount) {
-            result.add("description", "Not enough balance");
-            return "Not enough balance";
-        }
         result.add("description", "ok");
         return "ok";
-    }
-
-    public boolean hasLoggableError() {
-        return false;
     }
 
     public void execute() {
@@ -66,10 +58,11 @@ public class SendMoney extends DefaultTransaction{
         }
         Account sender = bank.getAccountWithIBAN(account);
         Account receiver = bank.getAccountWithIBAN(this.receiver, email);
-
-        double receivedAmount = amount * bank.getExchangeRate(sender.getCurrency(), receiver.getCurrency());
-        sender.setBalance(sender.getBalance() - amount);
-        receiver.setBalance(receiver.getBalance() + receivedAmount);
+        if (sender.getBalance() >= amount) {
+            double receivedAmount = amount * bank.getExchangeRate(sender.getCurrency(), receiver.getCurrency());
+            sender.setBalance(sender.getBalance() - amount);
+            receiver.setBalance(receiver.getBalance() + receivedAmount);
+        }
     }
 
     public void remember() {
@@ -80,8 +73,8 @@ public class SendMoney extends DefaultTransaction{
         bank.addTransaction(email, this);
         DefaultTransaction receivedMoney = new SendMoney(this);
         receivedMoney.burnDetails();
-        bank.addTransaction(bank.getEntryWithIBAN(receiver, email).getUser().getEmail(), receivedMoney);
-
+        //bank.addTransaction(bank.getEntryWithIBAN(receiver, email).getUser().getEmail(), receivedMoney);
+        //Were we not supposed to add a paired transaction for the receiver account???
     }
 
     public void burnDetails() {
@@ -89,13 +82,18 @@ public class SendMoney extends DefaultTransaction{
             return;
         }
         details = new JsonObject();
-        details.add("description", description);
-        details.add("receiverIBAN", bank.getAccountWithIBAN(receiver, email).getIBAN());
-        details.add("senderIBAN", bank.getAccountWithIBAN(account, email).getIBAN());
-        String amount = Double.toString(this.amount);
-        amount += " " + bank.getAccountWithIBAN(account, email).getCurrency();
-        details.add("amount", amount);
-        details.add("transferType", status);
         details.add("timestamp", timestamp);
+        Account sender = bank.getAccountWithIBAN(account);
+        if (sender.getBalance() >= amount) {
+            details.add("description", description);
+            details.add("receiverIBAN", bank.getAccountWithIBAN(receiver, email).getIBAN());
+            details.add("senderIBAN", bank.getAccountWithIBAN(account, email).getIBAN());
+            String amount = Double.toString(this.amount);
+            amount += " " + bank.getAccountWithIBAN(account, email).getCurrency();
+            details.add("amount", amount);
+            details.add("transferType", status);
+        } else {
+            details.add("description", "Insufficient funds");
+        }
     }
 }

@@ -51,6 +51,10 @@ public class PayOnline extends DefaultTransaction {
             return;
         }
 
+        Card card = bank.getCard(cardNumber);
+        if (card.getStatus().equals("frozen")) {
+            return;
+        }
 
         Account account = bank.getAccountWithCard(cardNumber);
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
@@ -73,6 +77,11 @@ public class PayOnline extends DefaultTransaction {
         }
         details = new JsonObject();
         details.add("timestamp", timestamp);
+        Card card = bank.getCard(cardNumber);
+        if (card.getStatus().equals("frozen")) {
+            details.add("description", "The card is frozen");
+            return;
+        }
 
         Account account = bank.getAccountWithCard(cardNumber);
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());

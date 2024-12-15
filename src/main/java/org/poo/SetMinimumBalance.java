@@ -3,22 +3,20 @@ package org.poo;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 
-import java.math.BigDecimal;
-
-public class AddFunds extends DefaultTransaction {
-    private String IBAN;
+public class SetMinimumBalance extends DefaultTransaction {
     private double amount;
+    private String account;
 
-    public AddFunds(CommandInput input, Bank bank) {
+    SetMinimumBalance(CommandInput input, Bank bank) {
         super(input, bank);
-        IBAN = input.getAccount();
         amount = input.getAmount();
+        account = input.getAccount();
     }
 
     protected String verify() {
         result = new JsonObject();
         result.add("timestamp", timestamp);
-        if (!bank.databaseHas(IBAN)) {
+        if (!bank.databaseHas(account)) {
             result.add("description", "Account not found");
             return "Account not found";
         }
@@ -31,6 +29,16 @@ public class AddFunds extends DefaultTransaction {
             return;
         }
 
-        bank.getAccountWithIBAN(IBAN).addFunds(amount);
+        bank.getAccountWithIBAN(account).setMinBalance(amount);
+    }
+
+    public void burnDetails() {
+        if (!verify().equals("ok")) {
+            return;
+        }
+
+        details = new JsonObject();
+        details.add("timestamp", timestamp);
+        details.add("command", commandName);
     }
 }

@@ -18,6 +18,7 @@ public abstract class CreateCard extends DefaultTransaction{
 
     protected String verify() {
         result = new JsonObject();
+        result.add("timestamp", timestamp);
         if (!bank.databaseHas(email)) {
             result.add("description", "User does not exist");
             return "User does not exist";

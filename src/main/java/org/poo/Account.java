@@ -17,11 +17,13 @@ public abstract class Account implements Visitable{
     protected String IBAN;
     protected ArrayList<Card> cards;
     protected HashMap<String, Card> cardsMap;
+    protected double minBalance;
 
     public Account() {
         balance = 0;
         cards = new ArrayList<>();
         cardsMap = new HashMap<>();
+        minBalance = 0;
     }
 
     public boolean isSavings() {
@@ -48,6 +50,10 @@ public abstract class Account implements Visitable{
 
     public Account setCurrency(String currency) {
         this.currency = currency;
+        return this;
+    }
+
+    public Account setInterestRate(double interestRate) {
         return this;
     }
 

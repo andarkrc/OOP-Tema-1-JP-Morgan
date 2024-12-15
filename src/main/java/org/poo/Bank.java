@@ -135,6 +135,13 @@ public class Bank {
         return null;
     }
 
+    public Card getCard(String cardNumber) {
+        if (databaseHas(cardNumber)) {
+            return getAccountWithCard(cardNumber).getCardsMap().get(cardNumber);
+        }
+        return null;
+    }
+
     public static Bank getInstance() {
         if (instance == null) {
             instance = new Bank();

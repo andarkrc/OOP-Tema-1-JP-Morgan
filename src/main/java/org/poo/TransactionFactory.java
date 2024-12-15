@@ -61,6 +61,14 @@ public abstract class TransactionFactory {
                 return new PrintTransactions(input, bank);
             }
 
+            case "setMinimumBalance" -> {
+                return new SetMinimumBalance(input, bank);
+            }
+
+            case "checkCardStatus" -> {
+                return new CheckCardStatus(input, bank);
+            }
+
             default -> {
                 return null;
             }

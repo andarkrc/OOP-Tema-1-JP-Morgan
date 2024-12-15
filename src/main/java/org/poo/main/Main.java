@@ -103,7 +103,6 @@ public final class Main {
             transaction.execute();
         }
 
-
         FileWriter outFile = new FileWriter(filePath2);
         outFile.write(output.finalizeData());
         outFile.close();
