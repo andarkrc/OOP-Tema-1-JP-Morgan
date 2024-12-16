@@ -13,6 +13,12 @@ public class ChangeInterestRate extends DefaultTransaction {
         account = input.getAccount();
     }
 
+    public void burnDetails() {
+        details = new JsonObject();
+        details.add("timestamp", timestamp);
+        details.add("description", "Interest rate of the account changed to " + interestRate);
+    }
+
     protected String verify() {
         result = new JsonObject();
         result.add("timestamp", timestamp);
@@ -21,11 +27,18 @@ public class ChangeInterestRate extends DefaultTransaction {
             return "Account not found";
         }
         if (!bank.getAccountWithIBAN(account).isSavings()) {
-            result.add("description", "Account not savings");
-            return "Account not savings";
+            result.add("description", "This is not a savings account");
+            return "Account is not savings";
         }
         result.add("description", "ok");
         return "ok";
+    }
+
+    public boolean hasLoggableError() {
+        if (verify().equals("Account is not savings")) {
+            return true;
+        }
+        return false;
     }
 
     public void execute() {

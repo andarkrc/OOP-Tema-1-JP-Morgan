@@ -16,6 +16,10 @@ public abstract class CreateCard extends DefaultTransaction{
         number = Utils.generateCardNumber();
     }
 
+    protected CreateCard() {
+
+    }
+
     protected String verify() {
         result = new JsonObject();
         result.add("timestamp", timestamp);

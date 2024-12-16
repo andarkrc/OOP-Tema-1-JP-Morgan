@@ -81,6 +81,14 @@ public abstract class TransactionFactory {
                 return new Report(input, bank);
             }
 
+            case "addInterest" -> {
+                return new AddInterest(input, bank);
+            }
+
+            case "spendingsReport" -> {
+                return new SpendingsReport(input, bank);
+            }
+
             default -> {
                 return null;
             }

@@ -138,6 +138,40 @@ public final class JsonObject {
     }
 
     /**
+     * Finds the value (String) that has been added to the field "field".
+     * @param field     name of the field
+     * @return          value (String with no quotes)
+     */
+    public String getStringOfField(final String field) {
+        int startIdx = data.indexOf(field) + field.length() + 4;
+        int endIdx = startIdx;
+        while (data.charAt(endIdx) != '\n' && endIdx < data.length() - 1
+                && data.charAt(endIdx) != ',') {
+            endIdx++;
+        }
+        if (endIdx < data.length() - 1) {
+            endIdx--;
+        }
+        return data.substring(startIdx, endIdx);
+    }
+
+    /**
+     * Finds the value (Double) that has been added to the field "field".
+     * @param field     name of the field
+     * @return          value (Double)
+     */
+    public Double getDoubleOfField(final String field) {
+        int startIdx = data.indexOf(field) + field.length() + 3;
+        int endIdx = startIdx;
+        while (data.charAt(endIdx) != '\n' && endIdx < data.length() - 1
+                && data.charAt(endIdx) != ',') {
+            endIdx++;
+        }
+
+        return Double.parseDouble(data.substring(startIdx, endIdx));
+    }
+
+    /**
      * Returns the data stored as a JSON Object.
      *
      * @return      a string representing the data stored in the JSON Object

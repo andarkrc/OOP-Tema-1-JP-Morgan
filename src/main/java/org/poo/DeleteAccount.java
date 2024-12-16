@@ -33,6 +33,16 @@ public class DeleteAccount extends DefaultTransaction {
         return "ok";
     }
 
+    public void burnDetails() {
+        details = new JsonObject();
+        details.add("timestamp", timestamp);
+        if (bank.getAccountWithIBAN(IBAN).getBalance() > 0) {
+            details.add("description", "Account couldn't be deleted - there are funds remaining");
+        } else {
+            details.add("success", "Account deleted");
+        }
+    }
+
     public void execute() {
         if (!verify().equals("ok")) {
             return;
@@ -41,11 +51,11 @@ public class DeleteAccount extends DefaultTransaction {
 
         JsonObject output = new JsonObject();
         output.add("timestamp", timestamp);
-        if (Double.compare(0, bank.getAccountWithIBAN(IBAN).getBalance()) == 0) {
+        if (bank.getAccountWithIBAN(IBAN).getBalance() > 0) {
+            output.add("error", "Account couldn't be deleted - see org.poo.transactions for details");
+        } else {
             output.add("success", "Account deleted");
             bank.removeAccount(IBAN);
-        } else {
-            output.add("error", "Account couldn't be deleted - see org.poo.transactions for details");
         }
 
         JsonObject status = new JsonObject();

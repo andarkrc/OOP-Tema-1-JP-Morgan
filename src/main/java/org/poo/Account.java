@@ -57,6 +57,10 @@ public abstract class Account implements Visitable{
         return this;
     }
 
+    public double getInterestRate() {
+        return 0;
+    }
+
     public Account setAccountType(String accountType) {
         this.accountType = accountType;
         return this;

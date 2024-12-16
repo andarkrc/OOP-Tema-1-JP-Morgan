@@ -67,7 +67,10 @@ public class CheckCardStatus extends DefaultTransaction {
         if (!verify().equals("ok")) {
             return;
         }
-
+        Account acc = bank.getAccountWithCard(number);
+        if (acc.getBalance() > acc.getMinBalance() + 30) {
+            return;
+        }
         bank.addTransaction(bank.getEntryWithCard(number).getUser().getEmail(), this);
     }
 }

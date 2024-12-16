@@ -14,6 +14,15 @@ public class DeleteCard extends DefaultTransaction{
         number = input.getCardNumber();
     }
 
+    public DeleteCard(DefaultTransaction transaction, String number) {
+        commandName = transaction.getCommandName();
+        timestamp = transaction.getTimestamp();
+        bank = transaction.getBank();
+        this.number = number;
+        email = bank.getEntryWithCard(number).getUser().getEmail();
+        IBAN = bank.getAccountWithCard(number).getIBAN();
+    }
+
     protected String verify() {
         result = new JsonObject();
         result.add("timestamp", timestamp);

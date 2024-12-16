@@ -71,10 +71,14 @@ public class SendMoney extends DefaultTransaction{
         }
 
         bank.addTransaction(email, this);
+
+        if (bank.getAccountWithIBAN(account).getBalance() < amount) {
+            return;
+        }
+
         DefaultTransaction receivedMoney = new SendMoney(this);
         receivedMoney.burnDetails();
-        //bank.addTransaction(bank.getEntryWithIBAN(receiver, email).getUser().getEmail(), receivedMoney);
-        //Were we not supposed to add a paired transaction for the receiver account???
+        bank.addTransaction(bank.getEntryWithIBAN(receiver, email).getUser().getEmail(), receivedMoney);
     }
 
     public void burnDetails() {
@@ -89,7 +93,15 @@ public class SendMoney extends DefaultTransaction{
             details.add("receiverIBAN", bank.getAccountWithIBAN(receiver, email).getIBAN());
             details.add("senderIBAN", bank.getAccountWithIBAN(account, email).getIBAN());
             String amount = Double.toString(this.amount);
-            amount += " " + bank.getAccountWithIBAN(account, email).getCurrency();
+            if (status.equals("sent")) {
+                amount += " " + bank.getAccountWithIBAN(account, email).getCurrency();
+            }
+            if (status.equals("received")) {
+                String senCurrency = bank.getAccountWithIBAN(account, email).getCurrency();
+                String recCurrency = bank.getAccountWithIBAN(receiver, email).getCurrency();
+                amount = Double.toString(this.amount * bank.getExchangeRate(senCurrency, recCurrency));
+                amount += " " + recCurrency;
+            }
             details.add("amount", amount);
             details.add("transferType", status);
         } else {
@@ -98,6 +110,10 @@ public class SendMoney extends DefaultTransaction{
     }
 
     public String getAccount() {
-        return account;
+        if (status == "sent") {
+            return account;
+        } else {
+            return receiver;
+        }
     }
 }

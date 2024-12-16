@@ -2,6 +2,7 @@ package org.poo;
 
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
+import org.poo.utils.Utils;
 
 public class PayOnline extends DefaultTransaction {
 
@@ -62,6 +63,16 @@ public class PayOnline extends DefaultTransaction {
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
         if (account.getBalance() >= actualAmount) {
             account.setBalance(account.getBalance() - actualAmount);
+            if (card.isOneTime()) {
+                DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
+                deleteCard.burnDetails();
+                deleteCard.remember();
+                deleteCard.execute();
+                DefaultTransaction createCard = new CreateOneTimeCard(this, IBAN);
+                createCard.burnDetails();
+                createCard.remember();
+                createCard.execute();
+            }
         }
     }
 
@@ -98,5 +109,9 @@ public class PayOnline extends DefaultTransaction {
 
     public String getAccount() {
         return IBAN;
+    }
+
+    public boolean appearsInSpendingsReport() {
+        return details.getStringOfField("description").equals("Card payment");
     }
 }

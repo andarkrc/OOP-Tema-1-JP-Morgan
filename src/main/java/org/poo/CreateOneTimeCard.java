@@ -8,6 +8,15 @@ public class CreateOneTimeCard extends CreateCard {
         super(input, bank);
     }
 
+    public CreateOneTimeCard(DefaultTransaction transaction, String account) {
+        commandName = "createOneTimeCard";
+        bank = transaction.getBank();
+        timestamp = transaction.getTimestamp();
+        IBAN = account;
+        email = bank.getEntryWithIBAN(account).getUser().getEmail();
+        number = Utils.generateCardNumber();
+    }
+
     public void execute() {
         if (!verify().equals("ok")) {
             return;

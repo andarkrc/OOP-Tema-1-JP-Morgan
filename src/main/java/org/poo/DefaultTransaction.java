@@ -57,4 +57,12 @@ public abstract class DefaultTransaction implements Visitable {
     public String getAccount() {
         return "";
     }
+
+    public boolean appearsInSpendingsReport() {
+        return false;
+    }
+
+    public JsonObject getSpendingsData() {
+        return new JsonObject();
+    }
 }

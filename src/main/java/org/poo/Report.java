@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Report extends DefaultTransaction {
-    private String account;
-    private int startTimestamp;
-    private int endTimestamp;
+    protected String account;
+    protected int startTimestamp;
+    protected int endTimestamp;
 
     public Report(CommandInput input, Bank bank) {
         super(input, bank);
@@ -29,6 +29,14 @@ public class Report extends DefaultTransaction {
 
         result.add("description", "ok");
         return "ok";
+    }
+
+    public boolean hasLoggableError() {
+        if (verify().equals("Account not found")) {
+            return true;
+        }
+
+        return false;
     }
 
     public void execute() {

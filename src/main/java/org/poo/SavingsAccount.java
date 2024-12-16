@@ -13,6 +13,10 @@ public class SavingsAccount extends Account {
         return this;
     }
 
+    public double getInterestRate() {
+        return interestRate;
+    }
+
     public boolean isSavings() {
         return true;
     }
