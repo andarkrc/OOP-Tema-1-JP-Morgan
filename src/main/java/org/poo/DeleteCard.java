@@ -6,7 +6,7 @@ import org.poo.jsonobject.JsonObject;
 public class DeleteCard extends DefaultTransaction{
     private String email;
     private String number;
-    private String IBAN;
+    private String iban;
 
     public DeleteCard(CommandInput input, Bank bank) {
         super(input, bank);
@@ -20,7 +20,7 @@ public class DeleteCard extends DefaultTransaction{
         bank = transaction.getBank();
         this.number = number;
         email = bank.getEntryWithCard(number).getUser().getEmail();
-        IBAN = bank.getAccountWithCard(number).getIBAN();
+        iban = bank.getAccountWithCard(number).getIban();
     }
 
     protected String verify() {
@@ -55,7 +55,7 @@ public class DeleteCard extends DefaultTransaction{
         if (!verify().equals("ok")) {
             return;
         }
-        IBAN = bank.getAccountWithCard(number).getIBAN();
+        iban = bank.getAccountWithCard(number).getIban();
         bank.addTransaction(email,this);
     }
 
@@ -67,12 +67,12 @@ public class DeleteCard extends DefaultTransaction{
         details = new JsonObject();
         details.add("cardHolder", email);
         details.add("card", number);
-        details.add("account", bank.getAccountWithCard(number).getIBAN());
+        details.add("account", bank.getAccountWithCard(number).getIban());
         details.add("timestamp", timestamp);
         details.add("description", "The card has been destroyed");
     }
 
     public String getAccount() {
-        return IBAN;
+        return iban;
     }
 }

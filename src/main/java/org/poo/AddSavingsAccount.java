@@ -1,7 +1,6 @@
 package org.poo;
 
 import org.poo.fileio.CommandInput;
-import org.poo.utils.Utils;
 
 public class AddSavingsAccount extends AddAccount{
     private double interestRate;
@@ -18,7 +17,7 @@ public class AddSavingsAccount extends AddAccount{
         Account account = new SavingsAccount();
         account.setAccountType(accountType)
                 .setCurrency(currency)
-                .setIBAN(IBAN)
+                .setIban(iban)
                 .setInterestRate(interestRate);
         bank.addAccount(email, account);
     }

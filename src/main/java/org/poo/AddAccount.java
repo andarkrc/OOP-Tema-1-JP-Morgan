@@ -9,14 +9,14 @@ public abstract class AddAccount extends DefaultTransaction {
     protected String email;
     protected String currency;
     protected String accountType;
-    protected String IBAN;
+    protected String iban;
 
     public AddAccount(CommandInput input, Bank bank) {
         super(input, bank);
         email = input.getEmail();
         currency = input.getCurrency();
         accountType = input.getAccountType();
-        IBAN = Utils.generateIBAN();
+        iban = Utils.generateIBAN();
     }
 
     public void burnDetails() {
@@ -44,6 +44,6 @@ public abstract class AddAccount extends DefaultTransaction {
     }
 
     public String getAccount() {
-        return IBAN;
+        return iban;
     }
 }

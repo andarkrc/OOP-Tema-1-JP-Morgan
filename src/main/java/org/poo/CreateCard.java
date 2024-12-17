@@ -5,15 +5,15 @@ import org.poo.jsonobject.JsonObject;
 import org.poo.utils.Utils;
 
 public abstract class CreateCard extends DefaultTransaction{
-    protected String IBAN;
+    protected String iban;
     protected String email;
     protected String number;
 
     public CreateCard(CommandInput input, Bank bank) {
         super(input, bank);
-        IBAN = input.getAccount();
+        iban = input.getAccount();
         email = input.getEmail();
-        number = Utils.generateCardNumber();
+
     }
 
     protected CreateCard() {
@@ -28,12 +28,12 @@ public abstract class CreateCard extends DefaultTransaction{
             return "User does not exist";
         }
 
-        if (!bank.databaseHas(IBAN)) {
+        if (!bank.databaseHas(iban)) {
             result.add("description", "Account does not exist");
             return "Account does not exist";
         }
 
-        if (bank.getEntryWithEmail(email) != bank.getEntryWithIBAN(IBAN))  {
+        if (bank.getEntryWithEmail(email) != bank.getEntryWithIBAN(iban))  {
             result.add("description", "User does not own account");
             return "User does not own account";
         }
@@ -53,15 +53,21 @@ public abstract class CreateCard extends DefaultTransaction{
         if (!verify().equals("ok")) {
             return;
         }
+        // I am sorry that I am doing this
+        // there is no other way.
+        // Can't generate the number in the constructor.
+        // It needs to be generated only once, only if the transaction is valid.
+        number = Utils.generateCardNumber();
+
         details = new JsonObject();
         details.add("timestamp", timestamp);
-        details.add("account", IBAN);
+        details.add("account", iban);
         details.add("cardHolder", email);
         details.add("card", number);
         details.add("description", "New card created");
     }
 
     public String getAccount() {
-        return IBAN;
+        return iban;
     }
 }

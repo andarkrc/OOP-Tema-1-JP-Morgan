@@ -90,8 +90,8 @@ public class SendMoney extends DefaultTransaction{
         Account sender = bank.getAccountWithIBAN(account);
         if (sender.getBalance() >= amount) {
             details.add("description", description);
-            details.add("receiverIBAN", bank.getAccountWithIBAN(receiver, email).getIBAN());
-            details.add("senderIBAN", bank.getAccountWithIBAN(account, email).getIBAN());
+            details.add("receiverIBAN", bank.getAccountWithIBAN(receiver, email).getIban());
+            details.add("senderIBAN", bank.getAccountWithIBAN(account, email).getIban());
             String amount = Double.toString(this.amount);
             if (status.equals("sent")) {
                 amount += " " + bank.getAccountWithIBAN(account, email).getCurrency();

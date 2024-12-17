@@ -2,8 +2,6 @@ package org.poo;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.jsonobject.JsonArray;
-import org.poo.jsonobject.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +12,7 @@ public abstract class Account implements Visitable{
     protected String currency;
     protected String accountType;
     protected double balance;
-    protected String IBAN;
+    protected String iban;
     protected ArrayList<Card> cards;
     protected HashMap<String, Card> cardsMap;
     protected double minBalance;
@@ -71,8 +69,8 @@ public abstract class Account implements Visitable{
         return this;
     }
 
-    public Account setIBAN(String IBAN) {
-        this.IBAN = IBAN;
+    public Account setIban(String iban) {
+        this.iban = iban;
         return this;
     }
 }

@@ -2,7 +2,6 @@ package org.poo;
 
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
-import org.poo.utils.Utils;
 
 public class PayOnline extends DefaultTransaction {
 
@@ -12,7 +11,7 @@ public class PayOnline extends DefaultTransaction {
     private String description;
     private String commerciant;
     private String email;
-    private String IBAN;
+    private String iban;
 
     public PayOnline(CommandInput input, Bank bank) {
         super(input, bank);
@@ -61,14 +60,14 @@ public class PayOnline extends DefaultTransaction {
         Account account = bank.getAccountWithCard(cardNumber);
 
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
-        if (account.getBalance() >= actualAmount) {
+        if (Double.compare(account.getBalance(), actualAmount) >= 0) {
             account.setBalance(account.getBalance() - actualAmount);
             if (card.isOneTime()) {
                 DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
                 deleteCard.burnDetails();
                 deleteCard.remember();
                 deleteCard.execute();
-                DefaultTransaction createCard = new CreateOneTimeCard(this, IBAN);
+                DefaultTransaction createCard = new CreateOneTimeCard(this, account.getIban());
                 createCard.burnDetails();
                 createCard.remember();
                 createCard.execute();
@@ -80,7 +79,7 @@ public class PayOnline extends DefaultTransaction {
         if (!verify().equals("ok")) {
             return;
         }
-        IBAN = bank.getAccountWithCard(cardNumber).getIBAN();
+        iban = bank.getAccountWithCard(cardNumber).getIban();
         bank.addTransaction(email, this);
     }
 
@@ -108,7 +107,7 @@ public class PayOnline extends DefaultTransaction {
     }
 
     public String getAccount() {
-        return IBAN;
+        return iban;
     }
 
     public boolean appearsInSpendingsReport() {

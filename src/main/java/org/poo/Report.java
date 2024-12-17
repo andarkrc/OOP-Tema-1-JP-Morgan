@@ -4,7 +4,6 @@ import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonArray;
 import org.poo.jsonobject.JsonObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Report extends DefaultTransaction {
@@ -49,7 +48,7 @@ public class Report extends DefaultTransaction {
         reportData.add("timestamp", timestamp);
         Account acc = bank.getAccountWithIBAN(account);
         JsonObject accountData = new JsonObject();
-        accountData.add("IBAN", acc.getIBAN());
+        accountData.add("IBAN", acc.getIban());
         accountData.add("balance", acc.getBalance());
         accountData.add("currency", acc.getCurrency());
         List<DefaultTransaction> transactionsList =

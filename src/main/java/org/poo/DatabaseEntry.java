@@ -2,8 +2,6 @@ package org.poo;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.jsonobject.JsonArray;
-import org.poo.jsonobject.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +49,7 @@ public class DatabaseEntry implements Visitable {
 
     public void addAccount(Account account) {
         accounts.add(account);
-        accountMap.put(account.getIBAN(), account);
+        accountMap.put(account.getIban(), account);
     }
 
     public void removeAccount(String IBAN) {

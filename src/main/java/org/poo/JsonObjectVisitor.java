@@ -27,7 +27,7 @@ public class JsonObjectVisitor implements Visitor{
 
     public String visit(Account account) {
         JsonObject accountObj = new JsonObject();
-        accountObj.add("IBAN", account.getIBAN());
+        accountObj.add("IBAN", account.getIban());
         accountObj.add("balance", account.getBalance());
         accountObj.add("currency", account.getCurrency());
         accountObj.add("type", account.getAccountType());
@@ -44,7 +44,6 @@ public class JsonObjectVisitor implements Visitor{
         JsonObject cardObj = new JsonObject();
         cardObj.add("cardNumber", card.getNumber());
         cardObj.add("status", card.getStatus());
-
         return cardObj.finalizeData();
     }
 }

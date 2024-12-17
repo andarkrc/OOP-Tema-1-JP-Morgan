@@ -1,7 +1,6 @@
 package org.poo;
 
 import org.poo.fileio.CommandInput;
-import org.poo.utils.Utils;
 
 public class CreateNormalCard extends CreateCard {
     public CreateNormalCard(CommandInput input, Bank bank) {
@@ -14,6 +13,6 @@ public class CreateNormalCard extends CreateCard {
         }
 
         Card card = new NormalCard(number);
-        bank.addCard(IBAN, card);
+        bank.addCard(iban, card);
     }
 }

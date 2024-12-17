@@ -1,7 +1,6 @@
 package org.poo;
 
 import org.poo.fileio.CommandInput;
-import org.poo.utils.Utils;
 
 public class CreateOneTimeCard extends CreateCard {
     public CreateOneTimeCard(CommandInput input, Bank bank) {
@@ -12,9 +11,8 @@ public class CreateOneTimeCard extends CreateCard {
         commandName = "createOneTimeCard";
         bank = transaction.getBank();
         timestamp = transaction.getTimestamp();
-        IBAN = account;
+        iban = account;
         email = bank.getEntryWithIBAN(account).getUser().getEmail();
-        number = Utils.generateCardNumber();
     }
 
     public void execute() {
@@ -23,6 +21,6 @@ public class CreateOneTimeCard extends CreateCard {
         }
 
         Card card = new OneTimeCard(number);
-        bank.addCard(IBAN, card);
+        bank.addCard(iban, card);
     }
 }

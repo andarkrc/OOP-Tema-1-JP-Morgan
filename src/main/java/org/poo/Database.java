@@ -32,7 +32,7 @@ public class Database {
     public void addAccount(String email, Account account) {
         DatabaseEntry entry = entriesMap.get(email);
         entry.addAccount(account);
-        entriesMap.put(account.getIBAN(), entry);
+        entriesMap.put(account.getIban(), entry);
     }
 
     public void removeAccount(String IBAN) {
