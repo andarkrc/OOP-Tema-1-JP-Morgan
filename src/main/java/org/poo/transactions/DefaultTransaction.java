@@ -37,12 +37,11 @@ public abstract class DefaultTransaction implements Visitable {
         return visitor.visit(this);
     }
 
+
     /**
      * Executes the command if there are no errors that could cause crashes.
      */
-    public void execute() {
-
-    }
+    public abstract void execute();
 
     /**
      * Keeps track of the transaction in some way (usually in a transaction history).
@@ -50,6 +49,8 @@ public abstract class DefaultTransaction implements Visitable {
     public void remember() {
 
     }
+    // I know, I know, empty function, but not every transaction needs to be placed in a
+    // transaction history, so 1 empty function is better than 5 empty functions :)
 
     /**
      * Verifies if there are any errors that could cause crashes.
