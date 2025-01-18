@@ -4,4 +4,9 @@ public final class ClassicAccount extends Account {
     public ClassicAccount() {
         super();
     }
+
+    @Override
+    public boolean isClassic() {
+        return true;
+    }
 }

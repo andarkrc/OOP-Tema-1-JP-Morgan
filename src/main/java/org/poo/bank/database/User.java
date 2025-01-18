@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.UserInput;
 
+import java.time.LocalDate;
+
 @Setter
 @Getter
 public final class User {
@@ -11,15 +13,13 @@ public final class User {
     private String lastName;
     private String email;
     private String occupation;
-    private Date birthDate;
+    private LocalDate birthDate;
 
     public User(final UserInput input) {
         firstName = input.getFirstName();
         lastName = input.getLastName();
         email = input.getEmail();
         occupation = input.getOccupation();
-        String date = input.getBirthDate();
-        String[] dateTokens = date.split("-");
-        birthDate = new Date(Integer.parseInt(dateTokens[0]), Integer.parseInt(dateTokens[1]), Integer.parseInt(dateTokens[2]));
+        birthDate = LocalDate.parse(input.getBirthDate());
     }
 }

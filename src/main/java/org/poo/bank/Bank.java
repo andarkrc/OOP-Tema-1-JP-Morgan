@@ -1,5 +1,6 @@
 package org.poo.bank;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.accounts.Account;
@@ -15,6 +16,7 @@ import org.poo.jsonobject.JsonArray;
 import org.poo.transactions.DefaultTransaction;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class Bank {
@@ -244,6 +246,117 @@ public final class Bank {
         return null;
     }
 
+    public Commerciant getCommerciant(String commerciant) {
+        return commerciants.get(commerciant);
+    }
+
+    public boolean commerciantExists(String account) {
+        return commerciants.containsKey(account);
+    }
+
+    public Map<String, Double> getUpgradeMap() {
+        Map<String, Double> map = new HashMap<>();
+        map.put("student-silver", 100.0);
+        map.put("standard-silver", 100.0);
+        map.put("silver-gold", 250.0);
+        map.put("student-gold", 350.0);
+        map.put("standard-gold", 350.0);
+        return map;
+    }
+
+    public double getTotalPrice(double price, String currency, String email) {
+        String plan = getEntryWithEmail(email).getPlan();
+        double local_price = price * exchange.getRate(currency, "RON");
+        switch (plan) {
+            case "student", "gold" -> {
+                return price;
+            }
+            case "silver" -> {
+                return (local_price < 500) ? price : price + price * 0.001;
+            }
+            default -> {
+                return price + price * 0.002;
+            }
+        }
+    }
+
+    private Map<String, Double> getCashbacksMap() {
+        Map<String, Double> cashbacks = new HashMap<>();
+        cashbacks.put("100student", 0.001);
+        cashbacks.put("100standard", 0.001);
+        cashbacks.put("100silver", 0.003);
+        cashbacks.put("100gold", 0.005);
+
+        cashbacks.put("300student", 0.002);
+        cashbacks.put("300standard", 0.002);
+        cashbacks.put("300silver", 0.004);
+        cashbacks.put("300gold", 0.0055);
+
+        cashbacks.put("500student", 0.0025);
+        cashbacks.put("500standard", 0.0025);
+        cashbacks.put("500silver", 0.005);
+        cashbacks.put("500gold", 0.007);
+        return cashbacks;
+    }
+
+    private double spendingThresholdCashback(double price, String currency, String account, String commerciant) {
+        List<DefaultTransaction> transactions =
+                getEntryWithIBAN(account).getTransactionHistory().stream()
+                        .filter(e -> e.getAccount().equals(account)).toList();
+        double totalSum = 0.0;
+        String accountPlan = getEntryWithIBAN(account).getPlan();
+        String commerciantType = commerciants.get(commerciant).getType();
+        for (DefaultTransaction transaction : transactions) {
+            String comm = transaction.getDetails().getStringOfField("commerciant");
+            if (!comm.isEmpty()) {
+                if (commerciants.get(comm).getType().equals(commerciantType)) {
+                    String curr = getAccountWithIBAN(account).getCurrency();
+                    double amount = transaction.getDetails().getDoubleOfField("amount");
+                    totalSum += amount * exchange.getRate(curr, "RON");
+                }
+            } else {
+                String rec = transaction.getDetails().getStringOfField("receiver");
+                if (!rec.isEmpty()) {
+                    if (commerciants.containsKey(rec)) {
+                        if (commerciants.get(rec).getType().equals(commerciantType)) {
+                        double amount = transaction.getDetails().getDoubleOfField("amount");
+                        totalSum += amount;
+                        }
+                    }
+                }
+            }
+        }
+
+        Map<String, Double> cashbacks = getCashbacksMap();
+        double accountPrice = price * exchange.getRate(currency, getAccountWithIBAN(account).getCurrency());
+
+        if (totalSum >= 500) {
+            return accountPrice * cashbacks.get("500" + accountPlan);
+        }
+
+        if (totalSum >= 300) {
+            return accountPrice * cashbacks.get("300" + accountPlan);
+        }
+
+        if (totalSum >= 100) {
+            return accountPrice * cashbacks.get("100" + accountPlan);
+        }
+
+        return 0.0;
+    }
+
+    public double getCashBack(double price, String currency, String account, String commerciant) {
+        switch (commerciants.get(commerciant).getCashbackStrategy()) {
+            case "spendingThreshold" -> {
+                return spendingThresholdCashback(price, currency, account, commerciant);
+            }
+
+            default -> {
+                return 0.0;
+            }
+        }
+    }
+
     /**
      * Returns the instance of the bank.
      * If there is no instance, it will create a new instance and return it.
@@ -269,7 +382,9 @@ public final class Bank {
         exchange = CurrencyExchange.getInstance();
         exchange.init(rates);
         for (CommerciantInput commerciant : commerciantInput) {
-            commerciants.put(commerciant.getAccount(), new Commerciant(commerciant));
+            Commerciant com = new Commerciant(commerciant);
+            commerciants.put(com.getAccount(), com);
+            commerciants.put(com.getName(), com);
         }
     }
 }

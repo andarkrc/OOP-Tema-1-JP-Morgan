@@ -49,6 +49,10 @@ public final class PayOnline extends DefaultTransaction {
             result.add("description", "Card not found");
             return "Card not found";
         }
+        if (Double.compare(amount, 0.0) == 0) {
+            result.add("description", "Amount is zero");
+            return "Amount is zero";
+        }
 
         result.add("description", "ok");
         return "ok";
@@ -68,8 +72,10 @@ public final class PayOnline extends DefaultTransaction {
         Account account = bank.getAccountWithCard(cardNumber);
 
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
-        if (Double.compare(account.getBalance(), actualAmount) >= 0) {
-            account.setBalance(account.getBalance() - actualAmount);
+        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), email);
+        if (Double.compare(account.getBalance(), totalAmount) >= 0) {
+            account.setBalance(account.getBalance() - totalAmount);
+            account.addFunds(bank.getCashBack(amount, currency, account.getIban(), commerciant));
             if (card.isOneTime()) {
                 DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
                 deleteCard.burnDetails();
@@ -107,7 +113,8 @@ public final class PayOnline extends DefaultTransaction {
 
         Account account = bank.getAccountWithCard(cardNumber);
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
-        if (account.getBalance() < actualAmount) {
+        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), email);
+        if (account.getBalance() < totalAmount) {
             details.add("description", "Insufficient funds");
         } else {
             details.add("description", "Card payment");

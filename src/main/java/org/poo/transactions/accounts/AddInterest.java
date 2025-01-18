@@ -50,6 +50,29 @@ public final class AddInterest extends DefaultTransaction {
     }
 
     @Override
+    public void burnDetails() {
+        if (!verify().equals("ok")) {
+            return;
+        }
+
+        details = new JsonObject();
+        details.add("timestamp", timestamp);
+        details.add("description", "Interest rate income");
+        Account acc = bank.getAccountWithIBAN(this.account);
+        details.add("currency", acc.getCurrency());
+        details.add("amount", acc.getBalance() * acc.getInterestRate());
+    }
+
+    @Override
+    public void remember() {
+        if (!verify().equals("ok")) {
+            return;
+        }
+        String email = bank.getEntryWithIBAN(account).getUser().getEmail();
+        bank.addTransaction(email, this);
+    }
+
+    @Override
     public String getAccount() {
         return account;
     }

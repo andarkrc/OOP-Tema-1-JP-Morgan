@@ -143,6 +143,9 @@ public final class JsonObject {
      * @return          value (String with no quotes)
      */
     public String getStringOfField(final String field) {
+        if (!data.contains(field)) {
+            return "";
+        }
         int startIdx = data.indexOf(field) + field.length() + "\": \"".length();
         int endIdx = startIdx;
         while (data.charAt(endIdx) != '\n' && endIdx < data.length() - 1
@@ -161,6 +164,9 @@ public final class JsonObject {
      * @return          value (Double)
      */
     public Double getDoubleOfField(final String field) {
+        if (!data.contains(field)) {
+            return 0.0;
+        }
         int startIdx = data.indexOf(field) + field.length() + "\": ".length();
         int endIdx = startIdx;
         while (data.charAt(endIdx) != '\n' && endIdx < data.length() - 1
