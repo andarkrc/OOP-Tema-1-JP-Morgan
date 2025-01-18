@@ -4,13 +4,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.accounts.Account;
 import org.poo.bank.cards.Card;
+import org.poo.bank.commerciants.Commerciant;
 import org.poo.bank.database.Database;
 import org.poo.bank.database.DatabaseEntry;
 import org.poo.bank.database.User;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.UserInput;
 import org.poo.jsonobject.JsonArray;
 import org.poo.transactions.DefaultTransaction;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class Bank {
     private static Bank instance = null;
@@ -20,6 +25,7 @@ public final class Bank {
     @Getter
     private JsonArray output;
     private CurrencyExchange exchange;
+    private Map<String, Commerciant> commerciants;
 
     private Bank() {
 
@@ -257,9 +263,13 @@ public final class Bank {
      *
      * @param rates
      */
-    public void init(final ExchangeInput[] rates) {
+    public void init(final ExchangeInput[] rates, final CommerciantInput[] commerciantInput) {
         database = new Database();
+        commerciants = new HashMap<>();
         exchange = CurrencyExchange.getInstance();
         exchange.init(rates);
+        for (CommerciantInput commerciant : commerciantInput) {
+            commerciants.put(commerciant.getAccount(), new Commerciant(commerciant));
+        }
     }
 }

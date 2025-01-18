@@ -38,6 +38,10 @@ public final class DeleteAccount extends DefaultTransaction {
 
     @Override
     public void burnDetails() {
+        if (!verify().equals("ok")) {
+            return;
+        }
+
         details = new JsonObject();
         details.add("timestamp", timestamp);
         if (bank.getAccountWithIBAN(iban).getBalance() > 0) {
