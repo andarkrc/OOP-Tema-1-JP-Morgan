@@ -1,0 +1,65 @@
+commit 61eb55068d72ff8f3b3d6826dc7593f037786e80
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Thu Dec 19 13:30:46 2024 +0200
+
+    finished writing the README
+
+commit f8033dfc6756668addff3bce19bdd291efb7140e
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Thu Dec 19 11:39:12 2024 +0200
+
+    style checker + reorganised packages
+
+commit f3c633e58e77836c6f5a7c197efecd789cce33f1
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Tue Dec 17 14:12:32 2024 +0200
+
+    finished implementation
+
+commit c43da3f67b0c62874571773f1bc68894f45fc0be
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Mon Dec 16 17:52:08 2024 +0200
+
+    everything except a small bug in test 19
+
+commit e317d1e5088809e8ed9839d9691606a1e570fba1
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Sun Dec 15 14:41:48 2024 +0200
+
+    up to test 16
+
+commit 3aa5d76203136627997d6c98abab620f41bf6132
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Sun Dec 15 11:14:25 2024 +0200
+
+    solved up to test 13
+
+commit c90edb7108f9cf20996df7deb12ab94ea130b412
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Sat Dec 14 21:56:17 2024 +0200
+
+    some rework + up to test 11
+
+commit cb2450a866f5c3018eadd974fe47ce06465f278c
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Mon Dec 9 14:15:46 2024 +0200
+
+    better code base + task 3 & 4
+
+commit 321e8914abe1a9b1e4d65f19cb1a2469d1f93775
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Mon Dec 9 11:13:27 2024 +0200
+
+    foundations + first 2 tasks
+
+commit bba35c04d938457a9b9605b55454e9471060b589
+Author: Andrei Popa <popaaandrei00@gmail.com>
+Date:   Sun Dec 8 20:07:45 2024 +0200
+
+    added skels
+
+commit dc2341a513f4981e8ae076e595500021f98dac93
+Author: andarkrc <111296923+andarkrc@users.noreply.github.com>
+Date:   Sun Dec 8 20:06:09 2024 +0200
+
+    Initial commit
