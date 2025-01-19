@@ -8,6 +8,9 @@ import org.poo.transactions.cards.CreateNormalCard;
 import org.poo.transactions.cards.CreateOneTimeCard;
 import org.poo.transactions.cards.DeleteCard;
 import org.poo.transactions.payments.*;
+import org.poo.transactions.payments.splitpayments.AcceptSplitPayment;
+import org.poo.transactions.payments.splitpayments.SplitPayment;
+import org.poo.transactions.payments.splitpayments.SplitPaymentCustom;
 import org.poo.transactions.reports.PrintTransactions;
 import org.poo.transactions.reports.PrintUsers;
 import org.poo.transactions.reports.Report;
@@ -95,7 +98,24 @@ public abstract class TransactionFactory {
             }
 
             case "splitPayment" -> {
-                return new SplitPayment(input, bank);
+                switch(input.getSplitPaymentType()) {
+                    case "custom" -> {
+                        return new SplitPaymentCustom(input, bank);
+                    }
+
+                    case "equal" -> {
+                        return new SplitPayment(input, bank);
+                    }
+
+                    default -> {
+                        System.out.println("Unknown type of split payment.");
+                        return null;
+                    }
+                }
+            }
+
+            case "acceptSplitPayment" -> {
+                return new AcceptSplitPayment(input, bank);
             }
 
             case "report" -> {

@@ -178,6 +178,25 @@ public final class JsonObject {
     }
 
     /**
+     * Finds the value (Integer) that has been added to the field "field".
+     * @param field     name of the field
+     * @return          value (Integer)
+     */
+    public Integer getIntegerOfField(final String field) {
+        if (!data.contains(field)) {
+            return 0;
+        }
+        int startIdx = data.indexOf(field) + field.length() + "\": ".length();
+        int endIdx = startIdx;
+        while (data.charAt(endIdx) != '\n' && endIdx < data.length() - 1
+                && data.charAt(endIdx) != ',') {
+            endIdx++;
+        }
+
+        return Integer.parseInt(data.substring(startIdx, endIdx));
+    }
+
+    /**
      * Returns the data stored as a JSON Object.
      *
      * @return      a string representing the data stored in the JSON Object

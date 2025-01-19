@@ -42,6 +42,10 @@ public abstract class Account implements Visitable {
         return false;
     }
 
+    public boolean isBusiness() {
+        return false;
+    }
+
     /**
      * Accepts a visitor so it can retrieve data.
      *

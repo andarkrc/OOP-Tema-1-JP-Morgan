@@ -3,6 +3,7 @@ package org.poo.main;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.poo.bank.Bank;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.transactions.payments.splitpayments.SplitPayment;
 import org.poo.visitors.JsonObjectVisitor;
 import org.poo.transactions.TransactionFactory;
 import org.poo.checker.Checker;
@@ -96,12 +97,17 @@ public final class Main {
                 System.out.println("Unknown command: " + command.getCommand());
                 continue;
             }
-            transaction.burnDetails();
-            transaction.remember();
-            if (transaction.hasLoggableError()) {
-                output.addStringNoQuotes(transaction.accept(new JsonObjectVisitor()));
+            if (!command.getCommand().equals("splitPayment")) {
+                transaction.burnDetails();
+                transaction.remember();
+                if (transaction.hasLoggableError()) {
+                    output.addStringNoQuotes(transaction.accept(new JsonObjectVisitor()));
+                }
+                transaction.execute();
+            } else {
+                // Sus stuff, I know
+                bank.getSplitPayments().addProcess((SplitPayment) transaction);
             }
-            transaction.execute();
         }
 
         FileWriter outFile = new FileWriter(filePath2);

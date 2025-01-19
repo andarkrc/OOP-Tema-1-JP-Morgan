@@ -141,6 +141,13 @@ public final class DatabaseEntry implements Visitable {
      * @param transaction
      */
     public void addTransaction(final DefaultTransaction transaction) {
-        transactionHistory.add(transaction);
+        int i = 0;
+        for (DefaultTransaction t : transactionHistory) {
+            if (t.getTimestamp() > transaction.getTimestamp()) {
+                break;
+            }
+            i++;
+        }
+        transactionHistory.add(i, transaction);
     }
 }

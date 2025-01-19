@@ -1,6 +1,5 @@
 package org.poo.bank;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.accounts.Account;
@@ -28,6 +27,8 @@ public final class Bank {
     private JsonArray output;
     private CurrencyExchange exchange;
     private Map<String, Commerciant> commerciants;
+    @Getter
+    private SplitPaymentContainer splitPayments;
 
     private Bank() {
 
@@ -386,5 +387,6 @@ public final class Bank {
             commerciants.put(com.getAccount(), com);
             commerciants.put(com.getName(), com);
         }
+        splitPayments = new SplitPaymentContainer();
     }
 }

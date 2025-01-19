@@ -35,6 +35,15 @@ public final class JsonArray {
     }
 
     /**
+     * Adds a new double to the JSON Array.
+     *
+     * @param value     the new double added
+     */
+    public void add(final double value) {
+        addDouble(value);
+    }
+
+    /**
      * Adds a new string to the JSON Array.
      *
      * @param value     the new string added
@@ -44,6 +53,18 @@ public final class JsonArray {
             data += ",\n";
         }
         data += "\"" + value + "\"";
+    }
+
+    /**
+     * Adds a new double to the JSON Array.
+     *
+     * @param value     the new double added
+     */
+    public void addDouble(final double value) {
+        if (!data.isEmpty()) {
+            data += ",\n";
+        }
+        data += Double.toString(value);
     }
 
     /**
