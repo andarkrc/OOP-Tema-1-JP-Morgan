@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.poo.bank.accounts.Account;
 import org.poo.bank.cards.Card;
 import org.poo.bank.commerciants.Commerciant;
+import org.poo.bank.commerciants.DiscountCoupon;
 import org.poo.bank.database.Database;
 import org.poo.bank.database.DatabaseEntry;
 import org.poo.bank.database.User;
@@ -13,6 +14,7 @@ import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.UserInput;
 import org.poo.jsonobject.JsonArray;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -268,6 +270,59 @@ public final class Bank {
         return commerciants.containsKey(account);
     }
 
+    public void updateUserPlan(String email, double amount, String currency) {
+        DatabaseEntry entry = getEntryWithEmail(email);
+        String plan = entry.getPlan();
+        if (!plan.equals("silver")) {
+            return;
+        }
+        if (getExchangeRate(currency, "RON") * amount >= 300) {
+            entry.setSilverPayments(entry.getSilverPayments() + 1);
+        }
+        if (entry.getSilverPayments() == Constants.SILVER_PAYMENTS_REQUIRED) {
+            entry.setPlan("gold");
+        }
+    }
+
+    private Map<Integer, String> numberToCouponTypeMap() {
+        Map<Integer, String> couponTypeMap = new HashMap<>();
+        couponTypeMap.put(2, "Food");
+        couponTypeMap.put(5, "Clothes");
+        couponTypeMap.put(10, "Tech");
+
+        return couponTypeMap;
+    }
+
+    public void receiveCoupon(String account, String commerciant) {
+        Account acc = getAccountWithIBAN(account);
+        Commerciant com = getCommerciant(commerciant);
+        if (!com.getCashbackStrategy().equals("nrOfTransactions")) {
+            return;
+        }
+        DatabaseEntry entry = getEntryWithIBAN(account);
+        List<DefaultTransaction> transactions = entry.getTransactionHistory().stream()
+                .filter(e -> e.getAccount().equals(account))
+                .filter(e -> !e.getDetails().getStringOfField("description").equals("Insufficient funds"))
+                .filter(e -> getCommerciant(e.getDetails().getStringOfField("commerciant")) == com ||
+                        getCommerciant(e.getDetails().getStringOfField("receiverIBAN")) == com)
+                .toList();
+
+        //System.out.println("trying to receive coupon for " + com.getName() + ": " + transactions.size());
+
+        Map<Integer, String> map = numberToCouponTypeMap();
+        if (map.get(transactions.size()) == null) {
+            return;
+        }
+
+        for (DiscountCoupon coupon : acc.getAvailableCoupons()) {
+            if (coupon.getType().equals(map.get(transactions.size()))) {
+                acc.getUsableCoupons().add(coupon);
+                acc.getAvailableCoupons().remove(coupon);
+                break;
+            }
+        }
+    }
+
     public Map<String, Double> getUpgradeMap() {
         Map<String, Double> map = new HashMap<>();
         map.put("student-silver", 100.0);
@@ -332,7 +387,7 @@ public final class Bank {
                     totalSum += amount * exchange.getRate(curr, "RON");
                 }
             } else {
-                String rec = transaction.getDetails().getStringOfField("receiver");
+                String rec = transaction.getDetails().getStringOfField("receiverIBAN");
                 if (!rec.isEmpty()) {
                     if (commerciants.containsKey(rec)) {
                         if (commerciants.get(rec).getCashbackStrategy().equals(commerciantType)) {
@@ -363,7 +418,21 @@ public final class Bank {
     }
 
     private double applyCoupon(double price, String account, String commerciant) {
+        Account acc = getAccountWithIBAN(account);
+        if (acc.getUsableCoupons().isEmpty()) {
+            return 0.0;
+        }
 
+        Commerciant com = getCommerciant(commerciant);
+        for (DiscountCoupon coupon : acc.getUsableCoupons()) {
+            if (coupon.getType().equals(com.getType())) {
+                double cashback = price * coupon.getDiscount();
+                acc.getUsableCoupons().remove(coupon);
+                return cashback;
+            }
+        }
+
+        return 0.0;
     }
 
     public double getCashBack(double price, String currency, String account, String commerciant) {

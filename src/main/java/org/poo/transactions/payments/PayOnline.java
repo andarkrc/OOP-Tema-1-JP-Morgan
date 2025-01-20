@@ -50,6 +50,11 @@ public final class PayOnline extends DefaultTransaction {
             result.add("description", "Card not found");
             return "Card not found";
         }
+        Account account = bank.getAccountWithCard(cardNumber);
+        if (account.getPermission(email) < Constants.BASIC_LEVEL) {
+            result.add("description", "Card not found");
+            return "Card not found";
+        }
         if (Double.compare(amount, 0.0) == 0) {
             result.add("description", "Amount is zero");
             return "Amount is zero";
@@ -86,10 +91,14 @@ public final class PayOnline extends DefaultTransaction {
             }
         }
 
+        String ownerEmail = bank.getEntryWithCard(cardNumber).getUser().getEmail();
+
         double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), account.getIban());
         if (Double.compare(account.getBalance(), totalAmount) >= 0) {
             account.setBalance(account.getBalance() - totalAmount);
             account.addFunds(bank.getCashBack(amount, currency, account.getIban(), commerciant));
+            bank.receiveCoupon(account.getIban(), commerciant);
+            bank.updateUserPlan(ownerEmail, amount, currency);
             if (card.isOneTime()) {
                 DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
                 deleteCard.burnDetails();

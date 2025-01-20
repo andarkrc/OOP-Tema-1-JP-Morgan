@@ -52,6 +52,9 @@ public class CashWithdrawal extends DefaultTransaction {
         if (verify().equals("Card not found")) {
             return true;
         }
+        if (verify().equals("User not found")) {
+            return true;
+        }
         return false;
     }
 
@@ -102,17 +105,5 @@ public class CashWithdrawal extends DefaultTransaction {
         }
 
         acc.setBalance(acc.getBalance() - totalAmount);
-        /*
-        if (card.isOneTime()) {
-            DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
-            deleteCard.burnDetails();
-            deleteCard.remember();
-            deleteCard.execute();
-            DefaultTransaction createCard = new CreateOneTimeCard(this, acc.getIban());
-            createCard.burnDetails();
-            createCard.remember();
-            createCard.execute();
-        }
-        */
     }
 }

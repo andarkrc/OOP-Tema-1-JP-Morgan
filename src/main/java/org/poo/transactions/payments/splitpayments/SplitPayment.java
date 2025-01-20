@@ -80,6 +80,9 @@ public class SplitPayment extends DefaultTransaction {
             String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
+            if (acc.isSavings()) {
+                totalAmount = actualAmount;
+            }
             if (acc.getBalance() < totalAmount) {
                 firstAccount = iban;
                 break;
@@ -119,6 +122,9 @@ public class SplitPayment extends DefaultTransaction {
             Account acc = bank.getAccountWithIBAN(iban);
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
+            if (acc.isSavings()) {
+                totalAmount = actualAmount;
+            }
             if (acc.getBalance() < totalAmount) {
                 return;
             }
@@ -131,6 +137,9 @@ public class SplitPayment extends DefaultTransaction {
             Account acc = bank.getAccountWithIBAN(iban);
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
+            if (acc.isSavings()) {
+                totalAmount = actualAmount;
+            }
             acc.setBalance(acc.getBalance() - totalAmount);
         }
     }

@@ -22,6 +22,7 @@ public final class DatabaseEntry implements Visitable {
     private Map<String, Account> accountMap;
     private Map<String, String> aliases;
     private String plan;
+    private int silverPayments;
 
     public DatabaseEntry(final User user) {
         this.user = user;
@@ -29,6 +30,7 @@ public final class DatabaseEntry implements Visitable {
         transactionHistory = new ArrayList<>();
         accountMap = new HashMap<>();
         aliases = new HashMap<>();
+        silverPayments = 0;
         plan = (user.getOccupation().equals("student")) ? "student" : "standard";
     }
 

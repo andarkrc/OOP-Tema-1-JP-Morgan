@@ -13,6 +13,8 @@ public final class Constants {
     public static final int BASIC_LEVEL = 1;
     public static final int NO_LEVEL = 0;
 
+    public static final int SILVER_PAYMENTS_REQUIRED = 5;
+
     private Constants() {
 
     }

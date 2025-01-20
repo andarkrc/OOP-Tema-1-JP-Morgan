@@ -45,9 +45,13 @@ public final class SendMoney extends DefaultTransaction {
             result.add("description", "User not found");
             return "User not found";
         }
+        if (!bank.databaseHas(account, email)) {
+            result.add("description", "Sender should not be alias");
+            return "Sender should not be alias";
+        }
         if (!bank.databaseHas(account)) {
-            result.add("description", "User not found");
-            return "User not found";
+            result.add("description", "Account not found");
+            return "Account not found";
         }
         if (!bank.databaseHas(receiver, email) && !bank.commerciantExists(receiver)) {
             result.add("description", "User not found");
@@ -101,7 +105,10 @@ public final class SendMoney extends DefaultTransaction {
                 //cash back
                 String commerciantName = bank.getCommerciant(receiver).getName();
                 sender.addFunds(bank.getCashBack(amount, sender.getCurrency(), sender.getIban(), commerciantName));
+                bank.receiveCoupon(sender.getIban(), commerciantName);
             }
+            String ownerEmail = bank.getEntryWithIBAN(sender.getIban()).getUser().getEmail();
+            bank.updateUserPlan(ownerEmail, amount, sender.getCurrency());
         }
     }
 
