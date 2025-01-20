@@ -7,6 +7,6 @@ public class ClothesCoupon extends DiscountCoupon{
 
     @Override
     public String getType() {
-        return "clothes";
+        return "Clothes";
     }
 }

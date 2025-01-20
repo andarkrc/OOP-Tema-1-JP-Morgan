@@ -9,11 +9,22 @@ import org.poo.transactions.DefaultTransaction;
 public final class UpgradePlan extends DefaultTransaction {
     private String account;
     private String newPlanType;
+    private boolean isFree;
 
     public UpgradePlan(CommandInput input, Bank bank) {
         super(input, bank);
         account = input.getAccount();
         newPlanType = input.getNewPlanType();
+        isFree = false;
+    }
+
+    public UpgradePlan(final int timestamp, final Bank bank, final String account) {
+        commandName = "upgradePlan";
+        this.timestamp = timestamp;
+        this.bank = bank;
+        this.account = account;
+        newPlanType = "gold";
+        isFree = true;
     }
 
     @Override
@@ -33,8 +44,10 @@ public final class UpgradePlan extends DefaultTransaction {
         }
         double amount = bank.getUpgradeMap().get(currentPlan + "-" + newPlanType)
                         * bank.getExchangeRate("RON", acc.getCurrency());
-        double totalAmount = bank.getTotalPrice(amount, acc.getCurrency(), bank.getEntryWithIBAN(account).getUser().getEmail());
-        if (acc.getBalance() <amount) {
+        if (isFree) {
+            amount = 0;
+        }
+        if (acc.getBalance() < amount) {
             details.add("description", "Insufficient funds");
             return;
         }
@@ -85,14 +98,15 @@ public final class UpgradePlan extends DefaultTransaction {
         }
         double amount = bank.getUpgradeMap().get(currentPlan + "-" + newPlanType)
                         * bank.getExchangeRate("RON", acc.getCurrency());
-        double totalAmount = bank.getTotalPrice(amount, acc.getCurrency(), bank.getEntryWithIBAN(account).getUser().getEmail());
+        if (isFree) {
+            amount = 0;
+        }
         if (acc.getBalance() < amount) {
             // not enough funds
             return;
         }
         bank.getEntryWithIBAN(account).setPlan(newPlanType);
         acc.setBalance(acc.getBalance() - amount);
-        //System.out.println("Upgraded from " + currentPlan + " to " + newPlanType + " for " + totalAmount);
     }
 
     @Override

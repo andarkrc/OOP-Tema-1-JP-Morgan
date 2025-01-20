@@ -270,18 +270,19 @@ public final class Bank {
         return commerciants.containsKey(account);
     }
 
-    public void updateUserPlan(String email, double amount, String currency) {
+    public boolean updateUserPlan(String email, double amount, String currency) {
         DatabaseEntry entry = getEntryWithEmail(email);
         String plan = entry.getPlan();
         if (!plan.equals("silver")) {
-            return;
+            return false;
         }
         if (getExchangeRate(currency, "RON") * amount >= 300) {
             entry.setSilverPayments(entry.getSilverPayments() + 1);
         }
         if (entry.getSilverPayments() == Constants.SILVER_PAYMENTS_REQUIRED) {
-            entry.setPlan("gold");
+            return true;
         }
+        return false;
     }
 
     private Map<Integer, String> numberToCouponTypeMap() {
@@ -307,7 +308,7 @@ public final class Bank {
                         getCommerciant(e.getDetails().getStringOfField("receiverIBAN")) == com)
                 .toList();
 
-        //System.out.println("trying to receive coupon for " + com.getName() + ": " + transactions.size());
+
 
         Map<Integer, String> map = numberToCouponTypeMap();
         if (map.get(transactions.size()) == null) {
@@ -417,7 +418,7 @@ public final class Bank {
         return 0.0;
     }
 
-    private double applyCoupon(double price, String account, String commerciant) {
+    private double applyCoupon(double price, String currency, String account, String commerciant) {
         Account acc = getAccountWithIBAN(account);
         if (acc.getUsableCoupons().isEmpty()) {
             return 0.0;
@@ -428,7 +429,7 @@ public final class Bank {
             if (coupon.getType().equals(com.getType())) {
                 double cashback = price * coupon.getDiscount();
                 acc.getUsableCoupons().remove(coupon);
-                return cashback;
+                return cashback * getExchangeRate(currency, acc.getCurrency());
             }
         }
 
@@ -442,7 +443,7 @@ public final class Bank {
             }
 
             case "nrOfTransactions" -> {
-                return applyCoupon(price, account, commerciant);
+                return applyCoupon(price, currency, account, commerciant);
             }
 
             default -> {

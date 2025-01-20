@@ -7,6 +7,6 @@ public class TechCoupon extends DiscountCoupon {
 
     @Override
     public String getType() {
-        return "tech";
+        return "Tech";
     }
 }

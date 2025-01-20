@@ -7,6 +7,6 @@ public class FoodCoupon extends DiscountCoupon{
 
     @Override
     public String getType() {
-        return "food";
+        return "Food";
     }
 }

@@ -6,6 +6,7 @@ import org.poo.bank.cards.Card;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.transactions.accounts.UpgradePlan;
 import org.poo.transactions.cards.CreateOneTimeCard;
 import org.poo.transactions.cards.DeleteCard;
 import org.poo.utils.Constants;
@@ -98,7 +99,14 @@ public final class PayOnline extends DefaultTransaction {
             account.setBalance(account.getBalance() - totalAmount);
             account.addFunds(bank.getCashBack(amount, currency, account.getIban(), commerciant));
             bank.receiveCoupon(account.getIban(), commerciant);
-            bank.updateUserPlan(ownerEmail, amount, currency);
+            boolean shouldUpgrade = bank.updateUserPlan(ownerEmail, amount, currency);
+            if (shouldUpgrade) {
+                // Create and execute a new UpgradePlan transaction preset for gold
+                DefaultTransaction upgrade = new UpgradePlan(timestamp, bank, account.getIban());
+                upgrade.burnDetails();
+                upgrade.remember();
+                upgrade.execute();
+            }
             if (card.isOneTime()) {
                 DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
                 deleteCard.burnDetails();

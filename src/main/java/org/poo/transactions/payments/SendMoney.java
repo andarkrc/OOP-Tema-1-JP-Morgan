@@ -5,6 +5,7 @@ import org.poo.bank.accounts.Account;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.transactions.accounts.UpgradePlan;
 import org.poo.utils.Constants;
 
 public final class SendMoney extends DefaultTransaction {
@@ -108,7 +109,14 @@ public final class SendMoney extends DefaultTransaction {
                 bank.receiveCoupon(sender.getIban(), commerciantName);
             }
             String ownerEmail = bank.getEntryWithIBAN(sender.getIban()).getUser().getEmail();
-            bank.updateUserPlan(ownerEmail, amount, sender.getCurrency());
+            boolean shouldUpgrade = bank.updateUserPlan(ownerEmail, amount, sender.getCurrency());
+            if (shouldUpgrade) {
+                // Create and execute a new UpgradePlan transaction preset for gold
+                DefaultTransaction upgrade = new UpgradePlan(timestamp, bank, sender.getIban());
+                upgrade.burnDetails();
+                upgrade.remember();
+                upgrade.execute();
+            }
         }
     }
 
