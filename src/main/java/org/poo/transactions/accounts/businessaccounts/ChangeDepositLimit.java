@@ -7,12 +7,12 @@ import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
 import org.poo.utils.Constants;
 
-public class ChangeDepositLimit extends DefaultTransaction {
+public final class ChangeDepositLimit extends DefaultTransaction {
     private String email;
     private String account;
     private double amount;
 
-    public ChangeDepositLimit(CommandInput input, Bank bank) {
+    public ChangeDepositLimit(final CommandInput input, final Bank bank) {
         super(input, bank);
         email = input.getEmail();
         account = input.getAccount();

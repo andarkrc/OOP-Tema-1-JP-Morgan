@@ -10,6 +10,7 @@ import org.poo.visitors.Visitor;
 public abstract class Card implements Visitable {
     protected String number;
     protected String status;
+    protected String creator;
 
     public Card(final String number) {
         this.number = number;

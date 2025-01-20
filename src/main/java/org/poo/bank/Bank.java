@@ -262,21 +262,42 @@ public final class Bank {
         return null;
     }
 
-    public Commerciant getCommerciant(String commerciant) {
+    /**
+     * Returns the commerciant with name or iban commerciant.
+     *
+     * @param commerciant
+     * @return
+     */
+    public Commerciant getCommerciant(final String commerciant) {
         return commerciants.get(commerciant);
     }
 
-    public boolean commerciantExists(String account) {
+    /**
+     * Verifies if a specified commerciant exists.
+     *
+     * @param account
+     * @return
+     */
+    public boolean commerciantExists(final String account) {
         return commerciants.containsKey(account);
     }
 
-    public boolean updateUserPlan(String email, double amount, String currency) {
+    /**
+     * Returns whether the specified user should auto update its plan
+     * after the specified purchase.
+     *
+     * @param email
+     * @param amount
+     * @param currency
+     * @return
+     */
+    public boolean updateUserPlan(final String email, final double amount, final String currency) {
         DatabaseEntry entry = getEntryWithEmail(email);
         String plan = entry.getPlan();
         if (!plan.equals("silver")) {
             return false;
         }
-        if (getExchangeRate(currency, "RON") * amount >= 300) {
+        if (getExchangeRate(currency, "RON") * amount >= Constants.SILVER_PAYMENT) {
             entry.setSilverPayments(entry.getSilverPayments() + 1);
         }
         if (entry.getSilverPayments() == Constants.SILVER_PAYMENTS_REQUIRED) {
@@ -285,16 +306,28 @@ public final class Bank {
         return false;
     }
 
+    /**
+     * Generates the amount of purchases necessary to create a type of
+     * discount coupon.
+     *
+     * @return
+     */
     private Map<Integer, String> numberToCouponTypeMap() {
         Map<Integer, String> couponTypeMap = new HashMap<>();
-        couponTypeMap.put(2, "Food");
-        couponTypeMap.put(5, "Clothes");
-        couponTypeMap.put(10, "Tech");
+        couponTypeMap.put(Constants.FOOD_TRANSACTIONS, "Food");
+        couponTypeMap.put(Constants.CLOTHES_TRANSACTIONS, "Clothes");
+        couponTypeMap.put(Constants.TECH_TRANSACTIONS, "Tech");
 
         return couponTypeMap;
     }
 
-    public void receiveCoupon(String account, String commerciant) {
+    /**
+     * Checks and adds a coupon to the specified account from the specified commerciant.
+     *
+     * @param account
+     * @param commerciant
+     */
+    public void receiveCoupon(final String account, final String commerciant) {
         Account acc = getAccountWithIBAN(account);
         Commerciant com = getCommerciant(commerciant);
         if (!com.getCashbackStrategy().equals("nrOfTransactions")) {
@@ -303,9 +336,10 @@ public final class Bank {
         DatabaseEntry entry = getEntryWithIBAN(account);
         List<DefaultTransaction> transactions = entry.getTransactionHistory().stream()
                 .filter(e -> e.getAccount().equals(account))
-                .filter(e -> !e.getDetails().getStringOfField("description").equals("Insufficient funds"))
-                .filter(e -> getCommerciant(e.getDetails().getStringOfField("commerciant")) == com ||
-                        getCommerciant(e.getDetails().getStringOfField("receiverIBAN")) == com)
+                .filter(e -> !e.getDetails().getStringOfField("description")
+                        .equals("Insufficient funds"))
+                .filter(e -> getCommerciant(e.getDetails().getStringOfField("commerciant")) == com
+                        || getCommerciant(e.getDetails().getStringOfField("receiverIBAN")) == com)
                 .toList();
 
 
@@ -324,57 +358,87 @@ public final class Bank {
         }
     }
 
+    /**
+     * Returns the prices to upgrade from and to different plans.
+     *
+     * @return
+     */
     public Map<String, Double> getUpgradeMap() {
         Map<String, Double> map = new HashMap<>();
-        map.put("student-silver", 100.0);
-        map.put("standard-silver", 100.0);
-        map.put("silver-gold", 250.0);
-        map.put("student-gold", 350.0);
-        map.put("standard-gold", 350.0);
+        map.put("student-silver", Constants.BASIC_SILVER);
+        map.put("standard-silver", Constants.BASIC_SILVER);
+        map.put("silver-gold", Constants.SILVER_GOLD);
+        map.put("student-gold", Constants.BASIC_GOLD);
+        map.put("standard-gold", Constants.BASIC_GOLD);
         return map;
     }
 
-    public double getTotalPrice(double price, String currency, String account) {
+    /**
+     * Applies the corresponding commission to the specified purchase.
+     *
+     * @param price
+     * @param currency
+     * @param account
+     * @return
+     */
+    public double getTotalPrice(final double price, final String currency, final String account) {
         String email = getEntryWithIBAN(account).getUser().getEmail();
         String plan = getEntryWithEmail(email).getPlan();
-        double local_price = price * exchange.getRate(currency, "RON");
+        double localPrice = price * exchange.getRate(currency, "RON");
         switch (plan) {
             case "student", "gold" -> {
                 return price;
             }
             case "silver" -> {
-                return (local_price < 500) ? price : price + price * 0.001;
+                return (localPrice < Constants.SILVER_COMMISSION) ? price
+                        : price + price * Constants.COMMISSION_01;
             }
             default -> {
-                return price + price * 0.002;
+                return price + price * Constants.COMMISSION_02;
             }
         }
     }
 
+    /**
+     * Returns the map of different cashbacks depending on threshold and plan.
+     *
+     * @return
+     */
     private Map<String, Double> getCashbacksMap() {
         Map<String, Double> cashbacks = new HashMap<>();
-        cashbacks.put("100student", 0.001);
-        cashbacks.put("100standard", 0.001);
-        cashbacks.put("100silver", 0.003);
-        cashbacks.put("100gold", 0.005);
+        cashbacks.put("100student", Constants.COMMISSION_01);
+        cashbacks.put("100standard", Constants.COMMISSION_01);
+        cashbacks.put("100silver", Constants.COMMISSION_03);
+        cashbacks.put("100gold", Constants.COMMISSION_05);
 
-        cashbacks.put("300student", 0.002);
-        cashbacks.put("300standard", 0.002);
-        cashbacks.put("300silver", 0.004);
-        cashbacks.put("300gold", 0.0055);
+        cashbacks.put("300student", Constants.COMMISSION_02);
+        cashbacks.put("300standard", Constants.COMMISSION_02);
+        cashbacks.put("300silver", Constants.COMMISSION_04);
+        cashbacks.put("300gold", Constants.COMMISSION_055);
 
-        cashbacks.put("500student", 0.0025);
-        cashbacks.put("500standard", 0.0025);
-        cashbacks.put("500silver", 0.005);
-        cashbacks.put("500gold", 0.007);
+        cashbacks.put("500student", Constants.COMMISSION_025);
+        cashbacks.put("500standard", Constants.COMMISSION_025);
+        cashbacks.put("500silver", Constants.COMMISSION_05);
+        cashbacks.put("500gold", Constants.COMMISSION_07);
         return cashbacks;
     }
 
-    private double spendingThresholdCashback(double price, String currency, String account, String commerciant) {
+    /**
+     * Calculates the corresponding cashback for a threshold type commerciant.
+     *
+     * @param price
+     * @param currency
+     * @param account
+     * @param commerciant
+     * @return
+     */
+    private double spendingThresholdCashback(final double price, final String currency,
+                                             final String account, final String commerciant) {
         List<DefaultTransaction> transactions =
                 getEntryWithIBAN(account).getTransactionHistory().stream()
                         .filter(e -> e.getAccount().equals(account))
-                        .filter(e -> !e.getDetails().getStringOfField("description").equals("Insufficient funds"))
+                        .filter(e -> !e.getDetails().getStringOfField("description")
+                                .equals("Insufficient funds"))
                         .toList();
         double totalSum = 0.0;
         String accountPlan = getEntryWithIBAN(account).getPlan();
@@ -401,24 +465,35 @@ public final class Bank {
         }
 
         Map<String, Double> cashbacks = getCashbacksMap();
-        double accountPrice = price * exchange.getRate(currency, getAccountWithIBAN(account).getCurrency());
+        double accountPrice = price * exchange.getRate(currency,
+                getAccountWithIBAN(account).getCurrency());
 
-        if (totalSum >= 500) {
+        if (totalSum >= Constants.THRESHOLD_BIG) {
             return accountPrice * cashbacks.get("500" + accountPlan);
         }
 
-        if (totalSum >= 300) {
+        if (totalSum >= Constants.THRESHOLD_MEDIUM) {
             return accountPrice * cashbacks.get("300" + accountPlan);
         }
 
-        if (totalSum >= 100) {
+        if (totalSum >= Constants.THRESHOLD_SMALL) {
             return accountPrice * cashbacks.get("100" + accountPlan);
         }
 
         return 0.0;
     }
 
-    private double applyCoupon(double price, String currency, String account, String commerciant) {
+    /**
+     * Calculates the corresponding cashback of a nrOfTransactions commerciant
+     *
+     * @param price
+     * @param currency
+     * @param account
+     * @param commerciant
+     * @return
+     */
+    private double applyCoupon(final double price, final String currency, final String account,
+                               final String commerciant) {
         Account acc = getAccountWithIBAN(account);
         if (acc.getUsableCoupons().isEmpty()) {
             return 0.0;
@@ -436,7 +511,18 @@ public final class Bank {
         return 0.0;
     }
 
-    public double getCashBack(double price, String currency, String account, String commerciant) {
+    /**
+     * Returns the corresponding cashback for a specified purchase, depending
+     * on the type of the specified commerciant.
+     *
+     * @param price
+     * @param currency
+     * @param account
+     * @param commerciant
+     * @return
+     */
+    public double getCashBack(final double price, final String currency,
+                              final String account, final String commerciant) {
         switch (commerciants.get(commerciant).getCashbackStrategy()) {
             case "spendingThreshold" -> {
                 return spendingThresholdCashback(price, currency, account, commerciant);

@@ -6,8 +6,6 @@ import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonArray;
 import org.poo.jsonobject.JsonObject;
 
-import java.util.HashMap;
-
 public final class SplitPaymentCustom extends SplitPayment {
     public SplitPaymentCustom(final CommandInput input, final Bank bank) {
         super(input, bank);
@@ -54,7 +52,8 @@ public final class SplitPaymentCustom extends SplitPayment {
         String firstAccount = "";
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
-            double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
+            double actualAmount = amounts.get(iban)
+                    * bank.getExchangeRate(currency, acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.getBalance() < totalAmount) {
                 firstAccount = iban;
@@ -83,7 +82,8 @@ public final class SplitPaymentCustom extends SplitPayment {
             return;
         }
         if (!firstAccount.isEmpty()) {
-            details.add("error", "Account " + firstAccount + " has insufficient funds for a split payment.");
+            details.add("error", "Account " + firstAccount
+                    + " has insufficient funds for a split payment.");
         }
     }
 }

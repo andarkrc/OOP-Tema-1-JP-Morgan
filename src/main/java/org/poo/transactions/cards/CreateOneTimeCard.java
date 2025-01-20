@@ -27,5 +27,6 @@ public final class CreateOneTimeCard extends CreateCard {
 
         Card card = new OneTimeCard(number);
         bank.addCard(iban, card);
+        card.setCreator(email);
     }
 }

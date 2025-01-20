@@ -1,9 +1,12 @@
 package org.poo.transactions.cards;
 
 import org.poo.bank.Bank;
+import org.poo.bank.accounts.Account;
+import org.poo.bank.cards.Card;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.utils.Constants;
 
 public final class DeleteCard extends DefaultTransaction {
     private String email;
@@ -37,10 +40,21 @@ public final class DeleteCard extends DefaultTransaction {
             result.add("description", "Card does not exist");
             return "Card does not exist";
         }
-        if (bank.getEntryWithEmail(email) != bank.getEntryWithCard(number)) {
-            result.add("description", "User does not own card");
-            return "User does not own card";
+
+        Account acc = bank.getAccountWithCard(number);
+        Card card = bank.getCard(number);
+        if (acc.getPermission(email) < Constants.BASIC_LEVEL) {
+            result.add("description", "Account does not have permission");
+            return "Account does not have permission";
         }
+
+        if (acc.getPermission(email) == Constants.BASIC_LEVEL) {
+            if (!card.getCreator().equals(email)) {
+                result.add("description", "Account does not have permission");
+                return "Account does not have permission";
+            }
+        }
+
         result.add("description", "ok");
         return "ok";
     }

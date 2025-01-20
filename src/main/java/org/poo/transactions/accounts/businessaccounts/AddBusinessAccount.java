@@ -7,8 +7,8 @@ import org.poo.fileio.CommandInput;
 import org.poo.transactions.accounts.AddAccount;
 import org.poo.utils.Constants;
 
-public class AddBusinessAccount extends AddAccount {
-    public AddBusinessAccount(CommandInput input, Bank bank) {
+public final class AddBusinessAccount extends AddAccount {
+    public AddBusinessAccount(final CommandInput input, final Bank bank) {
         super(input, bank);
     }
 

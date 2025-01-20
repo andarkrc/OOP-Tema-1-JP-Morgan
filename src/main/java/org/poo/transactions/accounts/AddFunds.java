@@ -55,15 +55,17 @@ public final class AddFunds extends DefaultTransaction {
         bank.getAccountWithIBAN(iban).addFunds(amount);
     }
 
+    @Override
     public void remember() {
         if (!verify().equals("ok")) {
             return;
         }
 
-        String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
-        bank.addTransaction(email, this);
+        String ownerEmail = bank.getEntryWithIBAN(iban).getUser().getEmail();
+        bank.addTransaction(ownerEmail, this);
     }
 
+    @Override
     public void burnDetails() {
         if (!verify().equals("ok")) {
             return;

@@ -105,7 +105,8 @@ public final class SendMoney extends DefaultTransaction {
             } else {
                 //cash back
                 String commerciantName = bank.getCommerciant(receiver).getName();
-                sender.addFunds(bank.getCashBack(amount, sender.getCurrency(), sender.getIban(), commerciantName));
+                sender.addFunds(bank.getCashBack(amount, sender.getCurrency(),
+                        sender.getIban(), commerciantName));
                 bank.receiveCoupon(sender.getIban(), commerciantName);
             }
             String ownerEmail = bank.getEntryWithIBAN(sender.getIban()).getUser().getEmail();

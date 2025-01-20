@@ -2,7 +2,15 @@ package org.poo.transactions;
 
 import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
-import org.poo.transactions.accounts.*;
+import org.poo.transactions.accounts.AddClassicAccount;
+import org.poo.transactions.accounts.AddFunds;
+import org.poo.transactions.accounts.AddInterest;
+import org.poo.transactions.accounts.AddSavingsAccount;
+import org.poo.transactions.accounts.ChangeInterestRate;
+import org.poo.transactions.accounts.DeleteAccount;
+import org.poo.transactions.accounts.SetAlias;
+import org.poo.transactions.accounts.SetMinimumBalance;
+import org.poo.transactions.accounts.UpgradePlan;
 import org.poo.transactions.accounts.businessaccounts.AddBusinessAccount;
 import org.poo.transactions.accounts.businessaccounts.AddNewBusinessAssociate;
 import org.poo.transactions.accounts.businessaccounts.ChangeDepositLimit;
@@ -11,12 +19,19 @@ import org.poo.transactions.cards.CheckCardStatus;
 import org.poo.transactions.cards.CreateNormalCard;
 import org.poo.transactions.cards.CreateOneTimeCard;
 import org.poo.transactions.cards.DeleteCard;
-import org.poo.transactions.payments.*;
+import org.poo.transactions.payments.CashWithdrawal;
+import org.poo.transactions.payments.PayOnline;
+import org.poo.transactions.payments.SendMoney;
+import org.poo.transactions.payments.WithdrawSavings;
 import org.poo.transactions.payments.splitpayments.AcceptSplitPayment;
 import org.poo.transactions.payments.splitpayments.RejectSplitPayment;
 import org.poo.transactions.payments.splitpayments.SplitPayment;
 import org.poo.transactions.payments.splitpayments.SplitPaymentCustom;
-import org.poo.transactions.reports.*;
+import org.poo.transactions.reports.BusinessReport;
+import org.poo.transactions.reports.PrintTransactions;
+import org.poo.transactions.reports.PrintUsers;
+import org.poo.transactions.reports.Report;
+import org.poo.transactions.reports.SpendingsReport;
 
 /**
  * Class that creates a new transaction based on the provided input.
@@ -104,7 +119,7 @@ public abstract class TransactionFactory {
             }
 
             case "splitPayment" -> {
-                switch(input.getSplitPaymentType()) {
+                switch (input.getSplitPaymentType()) {
                     case "custom" -> {
                         return new SplitPaymentCustom(input, bank);
                     }

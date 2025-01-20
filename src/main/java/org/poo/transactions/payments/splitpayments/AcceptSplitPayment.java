@@ -10,7 +10,7 @@ public final class AcceptSplitPayment extends DefaultTransaction {
     private String email;
     private String type;
 
-    public AcceptSplitPayment(CommandInput input, Bank bank) {
+    public AcceptSplitPayment(final CommandInput input, final Bank bank) {
         super(input, bank);
         email = input.getEmail();
         type = input.getSplitPaymentType();

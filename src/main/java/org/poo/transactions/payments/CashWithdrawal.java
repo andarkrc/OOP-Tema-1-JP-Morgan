@@ -6,16 +6,14 @@ import org.poo.bank.cards.Card;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
-import org.poo.transactions.cards.CreateOneTimeCard;
-import org.poo.transactions.cards.DeleteCard;
 
-public class CashWithdrawal extends DefaultTransaction {
+public final class CashWithdrawal extends DefaultTransaction {
     private String email;
     private String cardNumber;
     private double amount;
     private String location;
 
-    public CashWithdrawal(CommandInput input, Bank bank) {
+    public CashWithdrawal(final CommandInput input, final Bank bank) {
         super(input, bank);
         email = input.getEmail();
         cardNumber = input.getCardNumber();
@@ -27,11 +25,12 @@ public class CashWithdrawal extends DefaultTransaction {
     protected String verify() {
         result = new JsonObject();
         result.add("timestamp", timestamp);
-        if (!bank.databaseHas(email)){
+        if (!bank.databaseHas(email)) {
             result.add("description", "User not found");
             return "User not found";
         }
-        if (!bank.databaseHas(cardNumber)){
+
+        if (!bank.databaseHas(cardNumber)) {
             result.add("description", "Card not found");
             return "Card not found";
         }

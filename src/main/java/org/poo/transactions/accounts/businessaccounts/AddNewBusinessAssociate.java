@@ -12,13 +12,14 @@ public final class AddNewBusinessAssociate extends DefaultTransaction {
     private String email;
     private String role;
 
-    public AddNewBusinessAssociate(CommandInput input, Bank bank) {
+    public AddNewBusinessAssociate(final CommandInput input, final Bank bank) {
         super(input, bank);
         account = input.getAccount();
         email = input.getEmail();
         role = input.getRole();
     }
 
+    @Override
     protected String verify() {
         result = new JsonObject();
         result.add("timestamp", timestamp);
@@ -31,6 +32,12 @@ public final class AddNewBusinessAssociate extends DefaultTransaction {
         if (!bank.databaseHas(email)) {
             result.add("description", "User not found");
             return "User not found";
+        }
+
+        Account acc = bank.getAccountWithIBAN(account);
+        if (acc.getAssociates().contains(email)) {
+            result.add("description", "Account already associated with this email");
+            return "Account already associated with this email";
         }
 
         result.add("description", "ok");

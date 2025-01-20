@@ -1,9 +1,11 @@
 package org.poo.transactions.cards;
 
 import org.poo.bank.Bank;
+import org.poo.bank.accounts.Account;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.utils.Constants;
 import org.poo.utils.Utils;
 
 public abstract class CreateCard extends DefaultTransaction {
@@ -41,9 +43,10 @@ public abstract class CreateCard extends DefaultTransaction {
             return "Account does not exist";
         }
 
-        if (bank.getEntryWithEmail(email) != bank.getEntryWithIBAN(iban))  {
-            result.add("description", "User does not own account");
-            return "User does not own account";
+        Account acc = bank.getAccountWithIBAN(iban);
+        if (acc.getPermission(email) < Constants.BASIC_LEVEL) {
+            result.add("description", "Account does not have permission");
+            return "Account does not have permission";
         }
 
         result.add("description", "ok");

@@ -25,11 +25,15 @@
     1. ### User
         A class that contains information about a user.
    
+    1. ### Commerciant
+        A class that contains information about a commerciant.
+
     2. ### Account
-        The account comes in 2 flavours: 
+        The account comes in 3 flavours: 
         * Classic - great for everyday spending
         * Savings - benefits from receiving interest every once in a while
-       
+        * Business - can have multiple associates that are using it
+        
         The account also contains every card that was created for it.         
 
     1. ### Card
@@ -60,3 +64,11 @@
     could be easily expandable in the second part of the project. I will experience first hand how easily I can modify and expand the functionality of the project in the second part.<br>
     My only complain about the assignment is that the output for the commands are really chaotic. Some commands have output in case of error(payOnline if the card doesn't exist) some have outputs only in print transactions,
     some don't even have any kind of output, which makes it harder to make a generalized system for output handling.
+
+    ### AFTER PART 2
+    This part was really, REALLY painful to do. I couldn't even finish it. I ran out of time and I just don't want to debug this anymore.
+    I am almost going insane. The first part was already confusing enough, but this time, is just the cherry on top. I didn't think the assignment could be any more confusing
+    than it already was, but here I am. Lucky me I had a great foundation that I laid back in part 1. Even so, I am still contemplating my life choices.
+    I'd really love to see the 'official' source that was used to generate the refs.
+    </br>
+    The assignment had a lot of potential, but the execution was disastrous, stripping away my freedom to do it in a coherent way (because nor the tasks or refs were in any way coherent themselves). 

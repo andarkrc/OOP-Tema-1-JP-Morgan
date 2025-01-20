@@ -53,6 +53,11 @@ public class SplitPayment extends DefaultTransaction {
         rejected = splitPayment.rejected;
     }
 
+    /**
+     * Verifies if there are any errors that could cause crashes.
+     *
+     * @return      error message of the verifying process
+     */
     @Override
     protected String verify() {
         result = new JsonObject();
@@ -67,6 +72,10 @@ public class SplitPayment extends DefaultTransaction {
         return "ok";
     }
 
+    /**
+     * Makes a copy of the transaction's details so it's not affected by future
+     * transactions.
+     */
     @Override
     public void burnDetails() {
         if (!verify().equals("ok")) {
@@ -78,7 +87,8 @@ public class SplitPayment extends DefaultTransaction {
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
             String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
-            double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
+            double actualAmount = amounts.get(iban)
+                    * bank.getExchangeRate(currency, acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.isSavings()) {
                 totalAmount = actualAmount;
@@ -106,10 +116,14 @@ public class SplitPayment extends DefaultTransaction {
             return;
         }
         if (!firstAccount.isEmpty()) {
-            details.add("error", "Account " + firstAccount + " has insufficient funds for a split payment.");
+            details.add("error", "Account " + firstAccount
+                    + " has insufficient funds for a split payment.");
         }
     }
 
+    /**
+     * Executes the command if there are no errors that could cause crashes.
+     */
     @Override
     public void execute() {
         if (!verify().equals("ok")) {
@@ -120,7 +134,8 @@ public class SplitPayment extends DefaultTransaction {
         }
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
-            double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
+            double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency,
+                    acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.isSavings()) {
                 totalAmount = actualAmount;
@@ -135,7 +150,8 @@ public class SplitPayment extends DefaultTransaction {
 
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
-            double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
+            double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency,
+                    acc.getCurrency());
             double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.isSavings()) {
                 totalAmount = actualAmount;
@@ -144,6 +160,9 @@ public class SplitPayment extends DefaultTransaction {
         }
     }
 
+    /**
+     * Keeps track of the transaction in some way (usually in a transaction history).
+     */
     @Override
     public void remember() {
         if (!verify().equals("ok")) {

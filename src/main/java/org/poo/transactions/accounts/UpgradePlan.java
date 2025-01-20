@@ -11,7 +11,7 @@ public final class UpgradePlan extends DefaultTransaction {
     private String newPlanType;
     private boolean isFree;
 
-    public UpgradePlan(CommandInput input, Bank bank) {
+    public UpgradePlan(final CommandInput input, final Bank bank) {
         super(input, bank);
         account = input.getAccount();
         newPlanType = input.getNewPlanType();

@@ -94,7 +94,8 @@ public final class PayOnline extends DefaultTransaction {
 
         String ownerEmail = bank.getEntryWithCard(cardNumber).getUser().getEmail();
 
-        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), account.getIban());
+        double totalAmount = bank.getTotalPrice(actualAmount,
+                account.getCurrency(), account.getIban());
         if (Double.compare(account.getBalance(), totalAmount) >= 0) {
             account.setBalance(account.getBalance() - totalAmount);
             account.addFunds(bank.getCashBack(amount, currency, account.getIban(), commerciant));
@@ -159,7 +160,8 @@ public final class PayOnline extends DefaultTransaction {
             }
         }
 
-        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), account.getIban());
+        double totalAmount = bank.getTotalPrice(actualAmount,
+                account.getCurrency(), account.getIban());
         if (account.getBalance() < totalAmount) {
             details.add("description", "Insufficient funds");
         } else {

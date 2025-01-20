@@ -12,7 +12,7 @@ public final class ChangeSpendingLimit extends DefaultTransaction {
     private String account;
     private double amount;
 
-    public ChangeSpendingLimit(CommandInput input, Bank bank) {
+    public ChangeSpendingLimit(final CommandInput input, final Bank bank) {
         super(input, bank);
         email = input.getEmail();
         account = input.getAccount();
@@ -39,6 +39,11 @@ public final class ChangeSpendingLimit extends DefaultTransaction {
             return "Permission denied";
         }
 
+        if (!acc.isBusiness()) {
+            result.add("description", "This is not a business account");
+            return "Not business account";
+        }
+
         result.add("description", "ok");
         return "ok";
     }
@@ -46,6 +51,9 @@ public final class ChangeSpendingLimit extends DefaultTransaction {
     @Override
     public boolean hasLoggableError() {
         if (verify().equals("Permission denied")) {
+            return true;
+        }
+        if (verify().equals("Not business account")) {
             return true;
         }
 

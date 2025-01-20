@@ -6,11 +6,11 @@ import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
 
-public class RejectSplitPayment extends DefaultTransaction {
+public final class RejectSplitPayment extends DefaultTransaction {
     private String email;
     private String type;
 
-    public RejectSplitPayment(CommandInput input, Bank bank) {
+    public RejectSplitPayment(final CommandInput input, final Bank bank) {
         super(input, bank);
         email = input.getEmail();
         type = input.getSplitPaymentType();

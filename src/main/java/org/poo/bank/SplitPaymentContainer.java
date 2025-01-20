@@ -5,18 +5,30 @@ import org.poo.transactions.payments.splitpayments.SplitPayment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SplitPaymentContainer {
-    List<SplitPaymentProcess> processes;
+public final class SplitPaymentContainer {
+    private List<SplitPaymentProcess> processes;
 
     public SplitPaymentContainer() {
         processes = new ArrayList<>();
     }
 
-    public void addProcess(SplitPayment transaction) {
+    /**
+     * Adds a new split payment process to the list.
+     *
+     * @param transaction
+     */
+    public void addProcess(final SplitPayment transaction) {
         processes.add(new SplitPaymentProcess(transaction));
     }
 
-    public SplitPaymentProcess getFirstProcess(String type, String email) {
+    /**
+     * Returns the first split payment process of a certain type of the specified user.
+     *
+     * @param type
+     * @param email
+     * @return
+     */
+    public SplitPaymentProcess getFirstProcess(final String type, final String email) {
         // Normally, you would accept a specific payment
         // but, it isn't the case
         if (processes.isEmpty()) {
@@ -31,7 +43,13 @@ public class SplitPaymentContainer {
         return null;
     }
 
-    public void removeFirstProcess(String type, String email) {
+    /**
+     * Removes the first process of a certain type of the specified user.
+     *
+     * @param type
+     * @param email
+     */
+    public void removeFirstProcess(final String type, final String email) {
         // Again, you would target a specific payment
         if (!processes.isEmpty()) {
             for (SplitPaymentProcess process : processes) {

@@ -1,8 +1,10 @@
 package org.poo.bank.commerciants;
 
-public class FoodCoupon extends DiscountCoupon{
+import org.poo.utils.Constants;
+
+public final class FoodCoupon extends DiscountCoupon {
     public FoodCoupon() {
-        super(0.02);
+        super(Constants.FOOD_DISCOUNT);
     }
 
     @Override

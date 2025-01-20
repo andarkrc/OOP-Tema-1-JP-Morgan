@@ -14,7 +14,7 @@ public class SplitPaymentProcess {
     private List<String> waitingList;
     private SplitPayment payment;
 
-    public SplitPaymentProcess(SplitPayment transaction) {
+    public SplitPaymentProcess(final SplitPayment transaction) {
         payment = transaction;
         waitingList = new ArrayList<>();
         involvedUsers = new ArrayList<>();
@@ -28,21 +28,39 @@ public class SplitPaymentProcess {
         }
     }
 
+    /**
+     * Proceeds to do the split payment.
+     */
     public void proceed() {
         payment.burnDetails();
         payment.remember();
         payment.execute();
     }
 
+    /**
+     * Returns true if the split payment can proceed(all users have rejected/accepted).
+     *
+     * @return
+     */
     public boolean canProceed() {
         return waitingList.isEmpty();
     }
 
-    public void accept(String email) {
+    /**
+     * Accepts the split payment (for the user).
+     *
+     * @param email
+     */
+    public void accept(final String email) {
         waitingList.removeAll(List.of(email));
     }
 
-    public void reject(String email) {
+    /**
+     * Rejects the split payment (for the user).
+     *
+     * @param email
+     */
+    public void reject(final String email) {
         waitingList.removeAll(List.of(email));
         payment.setRejected(true);
     }

@@ -10,11 +10,16 @@ import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
 import org.poo.utils.Constants;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 
 public final class BusinessReport extends Report {
     private String type;
-    public BusinessReport(CommandInput input, Bank bank) {
+    public BusinessReport(final CommandInput input, final Bank bank) {
         super(input, bank);
         type = input.getType();
     }
@@ -37,7 +42,8 @@ public final class BusinessReport extends Report {
                 .filter(e -> e.getTimestamp() <= endTimestamp)
                 .filter(e -> e.getTimestamp() >= startTimestamp)
                 .filter(e -> !e.getEmail().isEmpty())
-                .filter(e -> !e.getDetails().getStringOfField("description").equals("Insufficient funds"))
+                .filter(e -> !e.getDetails().getStringOfField("description")
+                        .equals("Insufficient funds"))
                 .toList();
 
         List<String> managers = acc.getAssociates().stream()
@@ -58,8 +64,8 @@ public final class BusinessReport extends Report {
             JsonObject managerData = new JsonObject();
             User user = bank.getEntryWithEmail(manager).getUser();
             managerData.add("username", user.getLastName() + " " + user.getFirstName());
-            for (DefaultTransaction transaction :
-                    transactions.stream().filter(e -> e.getEmail().equals(manager)).toList()) {
+            for (DefaultTransaction transaction
+                    : transactions.stream().filter(e -> e.getEmail().equals(manager)).toList()) {
                 // i don't have time to rework the homework
                 // and the way the tests work won't allow me to do anything more humane than this
                 // no consistency at all between transactions
@@ -89,8 +95,8 @@ public final class BusinessReport extends Report {
             JsonObject employeeData = new JsonObject();
             User user = bank.getEntryWithEmail(employee).getUser();
             employeeData.add("username", user.getLastName() + " " + user.getFirstName());
-            for (DefaultTransaction transaction :
-                    transactions.stream().filter(e -> e.getEmail().equals(employee)).toList()) {
+            for (DefaultTransaction transaction
+                    : transactions.stream().filter(e -> e.getEmail().equals(employee)).toList()) {
                 // i don't have time to rework the homework
                 // and the way the tests work won't allow me to do anything more humane than this
                 // no consistency at all between transactions
@@ -139,7 +145,8 @@ public final class BusinessReport extends Report {
                 .filter(e -> e.getTimestamp() >= startTimestamp)
                 .filter(e -> !e.getEmail().isEmpty())
                 .filter(e -> !e.getEmail().equals(ownerEmail))
-                .filter(e -> !e.getDetails().getStringOfField("description").equals("Insufficient funds"))
+                .filter(e -> !e.getDetails().getStringOfField("description")
+                        .equals("Insufficient funds"))
                 .toList();
 
         List<String> managers = acc.getAssociates().stream()
@@ -202,8 +209,8 @@ public final class BusinessReport extends Report {
             commerciantData.add("total received", amounts.get(commerciant));
             List<String> involvedManagers = buyers.get(commerciant).stream()
                     .filter(e -> managers.contains(e))
-                    .map(e -> bank.getEntryWithEmail(e).getUser().getLastName() + " " +
-                            bank.getEntryWithEmail(e).getUser().getFirstName())
+                    .map(e -> bank.getEntryWithEmail(e).getUser().getLastName() + " "
+                            + bank.getEntryWithEmail(e).getUser().getFirstName())
                     .sorted()
                     .toList();
             JsonArray managersData = new JsonArray();
@@ -213,8 +220,8 @@ public final class BusinessReport extends Report {
 
             List<String> involvedEmployees = buyers.get(commerciant).stream()
                     .filter(e -> employees.contains(e))
-                    .map(e -> bank.getEntryWithEmail(e).getUser().getLastName() + " " +
-                            bank.getEntryWithEmail(e).getUser().getFirstName())
+                    .map(e -> bank.getEntryWithEmail(e).getUser().getLastName() + " "
+                            + bank.getEntryWithEmail(e).getUser().getFirstName())
                     .sorted()
                     .toList();
             JsonArray employeesData = new JsonArray();

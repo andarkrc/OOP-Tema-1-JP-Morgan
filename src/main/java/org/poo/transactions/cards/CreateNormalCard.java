@@ -18,5 +18,6 @@ public final class CreateNormalCard extends CreateCard {
 
         Card card = new NormalCard(number);
         bank.addCard(iban, card);
+        card.setCreator(email);
     }
 }
