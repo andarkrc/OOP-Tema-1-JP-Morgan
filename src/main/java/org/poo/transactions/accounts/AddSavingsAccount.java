@@ -4,6 +4,7 @@ import org.poo.bank.accounts.SavingsAccount;
 import org.poo.bank.Bank;
 import org.poo.bank.accounts.Account;
 import org.poo.fileio.CommandInput;
+import org.poo.utils.Constants;
 
 public final class AddSavingsAccount extends AddAccount {
     private double interestRate;
@@ -23,6 +24,7 @@ public final class AddSavingsAccount extends AddAccount {
                 .setCurrency(currency)
                 .setIban(iban)
                 .setInterestRate(interestRate);
+        account.addPermission(email, Constants.OWNER_LEVEL);
         bank.addAccount(email, account);
     }
 }

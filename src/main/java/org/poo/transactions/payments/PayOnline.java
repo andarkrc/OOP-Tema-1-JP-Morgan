@@ -8,6 +8,7 @@ import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
 import org.poo.transactions.cards.CreateOneTimeCard;
 import org.poo.transactions.cards.DeleteCard;
+import org.poo.utils.Constants;
 
 public final class PayOnline extends DefaultTransaction {
     private String cardNumber;
@@ -71,8 +72,21 @@ public final class PayOnline extends DefaultTransaction {
 
         Account account = bank.getAccountWithCard(cardNumber);
 
+        if (account.getPermission(email) < Constants.BASIC_LEVEL) {
+            // no permission for user
+            return;
+        }
+
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
-        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), email);
+
+        if (account.getPermission(email) == Constants.BASIC_LEVEL) {
+            if (actualAmount > account.getSpendingLimit()) {
+                // spending limit reached
+                return;
+            }
+        }
+
+        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), account.getIban());
         if (Double.compare(account.getBalance(), totalAmount) >= 0) {
             account.setBalance(account.getBalance() - totalAmount);
             account.addFunds(bank.getCashBack(amount, currency, account.getIban(), commerciant));
@@ -95,7 +109,8 @@ public final class PayOnline extends DefaultTransaction {
             return;
         }
         iban = bank.getAccountWithCard(cardNumber).getIban();
-        bank.addTransaction(email, this);
+        String ownerEmail = bank.getEntryWithCard(cardNumber).getUser().getEmail();
+        bank.addTransaction(ownerEmail, this);
     }
 
     @Override
@@ -112,8 +127,22 @@ public final class PayOnline extends DefaultTransaction {
         }
 
         Account account = bank.getAccountWithCard(cardNumber);
+
+        if (account.getPermission(email) < Constants.BASIC_LEVEL) {
+            details.add("description", "User does not have permission");
+            return;
+        }
+
         double actualAmount = amount * bank.getExchangeRate(currency, account.getCurrency());
-        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), email);
+
+        if (account.getPermission(email) == Constants.BASIC_LEVEL) {
+            if (actualAmount > account.getSpendingLimit()) {
+                details.add("description", "Spending limit reached");
+                return;
+            }
+        }
+
+        double totalAmount = bank.getTotalPrice(actualAmount, account.getCurrency(), account.getIban());
         if (account.getBalance() < totalAmount) {
             details.add("description", "Insufficient funds");
         } else {
@@ -126,6 +155,11 @@ public final class PayOnline extends DefaultTransaction {
     @Override
     public String getAccount() {
         return iban;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
     }
 
     @Override

@@ -66,7 +66,13 @@ public final class WithdrawSavings extends DefaultTransaction {
             details.add("description", "You do not have a classic account.");
             return;
         }
-        details.add("description", "Withdrew " + amount + " to account " + receiver.getIban());
+        details.add("amount", amount);
+        details.add("classicAccountIBAN", receiver.getIban());
+        details.add("savingsAccountIBAN", savings.getIban());
+        details.add("description", "Savings withdrawal");
+
+        String email = bank.getEntryWithIBAN(savings.getIban()).getUser().getEmail();
+        bank.addTransaction(email, this); // remember twice for classic account
     }
 
     @Override
@@ -113,5 +119,10 @@ public final class WithdrawSavings extends DefaultTransaction {
 
         receiver.addFunds(amount);
         savings.setBalance(savings.getBalance() - amount);
+    }
+
+    @Override
+    public String getAccount() {
+        return account;
     }
 }

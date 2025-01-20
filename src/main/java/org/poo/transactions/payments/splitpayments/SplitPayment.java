@@ -1,6 +1,7 @@
 package org.poo.transactions.payments.splitpayments;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.poo.bank.Bank;
 import org.poo.bank.accounts.Account;
 import org.poo.fileio.CommandInput;
@@ -16,12 +17,15 @@ public class SplitPayment extends DefaultTransaction {
     @Getter
     protected List<String> accounts;
     protected Map<String, Double> amounts;
+    @Getter
     protected double amount;
     protected String currency;
     @Getter
     protected String type;
     @Getter
     protected String account;
+    @Setter
+    protected boolean rejected;
 
     public SplitPayment(final CommandInput input, final Bank bank) {
         super(input, bank);
@@ -33,6 +37,7 @@ public class SplitPayment extends DefaultTransaction {
         for (String acc : accounts) {
             amounts.put(acc, amount / accounts.size());
         }
+        rejected = false;
     }
 
     protected SplitPayment(final SplitPayment splitPayment, final String targetAccount) {
@@ -45,6 +50,7 @@ public class SplitPayment extends DefaultTransaction {
         timestamp = splitPayment.timestamp;
         amount = splitPayment.amount;
         type = splitPayment.type;
+        rejected = splitPayment.rejected;
     }
 
     @Override
@@ -73,7 +79,7 @@ public class SplitPayment extends DefaultTransaction {
             Account acc = bank.getAccountWithIBAN(iban);
             String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
-            double totalAmount = bank.getTotalPrice(actualAmount, currency, email);
+            double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.getBalance() < totalAmount) {
                 firstAccount = iban;
                 break;
@@ -82,9 +88,6 @@ public class SplitPayment extends DefaultTransaction {
                 firstAccount = iban;
                 break;
             }
-        }
-        if (!firstAccount.isEmpty()) {
-            details.add("error", "Account " + firstAccount + " has insufficient funds for a split payment.");
         }
         details.add("amount", amount / accounts.size());
         details.add("description", String.format("Split payment of %.2f %s", amount, currency));
@@ -95,6 +98,13 @@ public class SplitPayment extends DefaultTransaction {
             accountsArray.add(iban);
         }
         details.add("involvedAccounts", accountsArray);
+        if (rejected) {
+            details.add("error", "One user rejected the payment.");
+            return;
+        }
+        if (!firstAccount.isEmpty()) {
+            details.add("error", "Account " + firstAccount + " has insufficient funds for a split payment.");
+        }
     }
 
     @Override
@@ -102,11 +112,13 @@ public class SplitPayment extends DefaultTransaction {
         if (!verify().equals("ok")) {
             return;
         }
+        if (rejected) {
+            return;
+        }
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
-            String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
-            double totalAmount = bank.getTotalPrice(actualAmount, currency, email);
+            double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.getBalance() < totalAmount) {
                 return;
             }
@@ -117,9 +129,8 @@ public class SplitPayment extends DefaultTransaction {
 
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
-            String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
-            double totalAmount = bank.getTotalPrice(actualAmount, currency, email);
+            double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             acc.setBalance(acc.getBalance() - totalAmount);
         }
     }

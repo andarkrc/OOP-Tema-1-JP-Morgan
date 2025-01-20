@@ -3,18 +3,20 @@ package org.poo.transactions;
 import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.accounts.*;
+import org.poo.transactions.accounts.businessaccounts.AddBusinessAccount;
+import org.poo.transactions.accounts.businessaccounts.AddNewBusinessAssociate;
+import org.poo.transactions.accounts.businessaccounts.ChangeDepositLimit;
+import org.poo.transactions.accounts.businessaccounts.ChangeSpendingLimit;
 import org.poo.transactions.cards.CheckCardStatus;
 import org.poo.transactions.cards.CreateNormalCard;
 import org.poo.transactions.cards.CreateOneTimeCard;
 import org.poo.transactions.cards.DeleteCard;
 import org.poo.transactions.payments.*;
 import org.poo.transactions.payments.splitpayments.AcceptSplitPayment;
+import org.poo.transactions.payments.splitpayments.RejectSplitPayment;
 import org.poo.transactions.payments.splitpayments.SplitPayment;
 import org.poo.transactions.payments.splitpayments.SplitPaymentCustom;
-import org.poo.transactions.reports.PrintTransactions;
-import org.poo.transactions.reports.PrintUsers;
-import org.poo.transactions.reports.Report;
-import org.poo.transactions.reports.SpendingsReport;
+import org.poo.transactions.reports.*;
 
 /**
  * Class that creates a new transaction based on the provided input.
@@ -37,6 +39,10 @@ public abstract class TransactionFactory {
 
                     case "savings" -> {
                         return new AddSavingsAccount(input, bank);
+                    }
+
+                    case "business" -> {
+                        return new AddBusinessAccount(input, bank);
                     }
 
                     default -> {
@@ -118,6 +124,10 @@ public abstract class TransactionFactory {
                 return new AcceptSplitPayment(input, bank);
             }
 
+            case "rejectSplitPayment" -> {
+                return new RejectSplitPayment(input, bank);
+            }
+
             case "report" -> {
                 return new Report(input, bank);
             }
@@ -140,6 +150,22 @@ public abstract class TransactionFactory {
 
             case "cashWithdrawal" -> {
                 return new CashWithdrawal(input, bank);
+            }
+
+            case "addNewBusinessAssociate" -> {
+                return new AddNewBusinessAssociate(input, bank);
+            }
+
+            case "changeSpendingLimit" -> {
+                return new ChangeSpendingLimit(input, bank);
+            }
+
+            case "changeDepositLimit" -> {
+                return new ChangeDepositLimit(input, bank);
+            }
+
+            case "businessReport" -> {
+                return new BusinessReport(input, bank);
             }
 
             default -> {

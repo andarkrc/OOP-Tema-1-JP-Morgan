@@ -27,6 +27,7 @@ public final class SplitPaymentCustom extends SplitPayment {
         timestamp = splitPayment.getTimestamp();
         amount = splitPayment.amount;
         type = splitPayment.type;
+        rejected = splitPayment.rejected;
     }
 
     @Override
@@ -53,9 +54,8 @@ public final class SplitPaymentCustom extends SplitPayment {
         String firstAccount = "";
         for (String iban : accounts) {
             Account acc = bank.getAccountWithIBAN(iban);
-            String email = bank.getEntryWithIBAN(iban).getUser().getEmail();
             double actualAmount = amounts.get(iban) * bank.getExchangeRate(currency, acc.getCurrency());
-            double totalAmount = bank.getTotalPrice(actualAmount, currency, email);
+            double totalAmount = bank.getTotalPrice(actualAmount, currency, iban);
             if (acc.getBalance() < totalAmount) {
                 firstAccount = iban;
                 break;
@@ -65,15 +65,11 @@ public final class SplitPaymentCustom extends SplitPayment {
                 break;
             }
         }
-        if (!firstAccount.isEmpty()) {
-            details.add("error", "Account " + firstAccount + " has insufficient funds for a split payment.");
-        }
         details.add("description", String.format("Split payment of %.2f %s", amount, currency));
         details.add("splitPaymentType", type);
         details.add("currency", currency);
         JsonArray accountsArray = new JsonArray();
         for (String iban : accounts) {
-            Account acc = bank.getAccountWithIBAN(iban);
             accountsArray.add(iban);
         }
         details.add("involvedAccounts", accountsArray);
@@ -82,5 +78,12 @@ public final class SplitPaymentCustom extends SplitPayment {
             amountsArray.add(amounts.get(iban));
         }
         details.add("amountForUsers", amountsArray);
+        if (rejected) {
+            details.add("error", "One user rejected the payment.");
+            return;
+        }
+        if (!firstAccount.isEmpty()) {
+            details.add("error", "Account " + firstAccount + " has insufficient funds for a split payment.");
+        }
     }
 }

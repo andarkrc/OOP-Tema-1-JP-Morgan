@@ -77,6 +77,7 @@ public class Report extends DefaultTransaction {
                 .filter(e -> e.getAccount().equals(account))
                 .filter(e -> e.getTimestamp() >= startTimestamp)
                 .filter(e -> e.getTimestamp() <= endTimestamp)
+                .filter(e -> !e.getCommandName().equals("addFunds")) // bruuh
                 .toList();
 
         JsonArray transactions = new JsonArray();

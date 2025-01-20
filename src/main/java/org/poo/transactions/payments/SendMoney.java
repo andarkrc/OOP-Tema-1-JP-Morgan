@@ -5,6 +5,7 @@ import org.poo.bank.accounts.Account;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.utils.Constants;
 
 public final class SendMoney extends DefaultTransaction {
     private String account;
@@ -52,10 +53,7 @@ public final class SendMoney extends DefaultTransaction {
             result.add("description", "User not found");
             return "User not found";
         }
-        if (bank.getEntryWithIBAN(account, email) != bank.getEntryWithEmail(email)) {
-            result.add("description", "Sender account does not belong to this account");
-            return "Sender account does not belong to this account";
-        }
+
         result.add("description", "ok");
         return "ok";
     }
@@ -75,8 +73,19 @@ public final class SendMoney extends DefaultTransaction {
             return;
         }
         Account sender = bank.getAccountWithIBAN(account);
+
+        if (sender.getPermission(email) < Constants.BASIC_LEVEL) {
+            // no permission
+            return;
+        }
+        if (sender.getPermission(email) == Constants.BASIC_LEVEL) {
+            if (amount > sender.getSpendingLimit()) {
+                // spending limit reached
+                return;
+            }
+        }
         Account receiverAcc = bank.getAccountWithIBAN(this.receiver, email);
-        double totalAmount = bank.getTotalPrice(amount, sender.getCurrency(), email);
+        double totalAmount = bank.getTotalPrice(amount, sender.getCurrency(), account);
         if (sender.getBalance() >= totalAmount) {
             String receiverCurrency = "RON";
             if (!bank.commerciantExists(receiver)) {
@@ -102,9 +111,10 @@ public final class SendMoney extends DefaultTransaction {
             return;
         }
 
-        bank.addTransaction(email, this);
+        String ownerEmail = bank.getEntryWithIBAN(account).getUser().getEmail();
+        bank.addTransaction(ownerEmail, this);
         Account sender = bank.getAccountWithIBAN(account);
-        double totalAmount = bank.getTotalPrice(amount, sender.getCurrency(), email);
+        double totalAmount = bank.getTotalPrice(amount, sender.getCurrency(), account);
         if (bank.getAccountWithIBAN(account).getBalance() < totalAmount) {
             return;
         }
@@ -125,7 +135,7 @@ public final class SendMoney extends DefaultTransaction {
         details = new JsonObject();
         details.add("timestamp", timestamp);
         Account sender = bank.getAccountWithIBAN(account);
-        double totalAmount = bank.getTotalPrice(amount, sender.getCurrency(), email);
+        double totalAmount = bank.getTotalPrice(amount, sender.getCurrency(), account);
         if (sender.getBalance() >= totalAmount) {
             details.add("description", description);
             if (!bank.commerciantExists(receiver)) {
@@ -159,6 +169,11 @@ public final class SendMoney extends DefaultTransaction {
         } else {
             return receiver;
         }
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
     }
 
     @Override

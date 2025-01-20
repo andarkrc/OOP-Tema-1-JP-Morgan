@@ -81,7 +81,7 @@ public final class Main {
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
 
         JsonArray output = new JsonArray();
-        System.out.println("Test" + filePath1);
+        System.out.println("Test " + filePath1);
         Bank bank = Bank.getInstance();
         bank.init(inputData.getExchangeRates(), inputData.getCommerciants());
         bank.setOutput(output);
@@ -109,6 +109,7 @@ public final class Main {
                 bank.getSplitPayments().addProcess((SplitPayment) transaction);
             }
         }
+
 
         FileWriter outFile = new FileWriter(filePath2);
         outFile.write(output.finalizeData());

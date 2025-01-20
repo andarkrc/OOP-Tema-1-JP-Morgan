@@ -6,11 +6,11 @@ import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
 
-public final class AcceptSplitPayment extends DefaultTransaction {
+public class RejectSplitPayment extends DefaultTransaction {
     private String email;
     private String type;
 
-    public AcceptSplitPayment(CommandInput input, Bank bank) {
+    public RejectSplitPayment(CommandInput input, Bank bank) {
         super(input, bank);
         email = input.getEmail();
         type = input.getSplitPaymentType();
@@ -48,14 +48,11 @@ public final class AcceptSplitPayment extends DefaultTransaction {
             return;
         }
 
-        // Why do you accept using the email, not the iban????
-        // Who am I, the guy who splits among his own accounts??
         SplitPaymentProcess process = bank.getSplitPayments().getFirstProcess(type, email);
-        process.accept(email);
 
-        if (process.canProceed()) {
-            process.proceed();
-            bank.getSplitPayments().removeFirstProcess(type, email);
-        }
+        //reject the payment
+        process.reject(email);
+        process.proceed();
+        bank.getSplitPayments().removeFirstProcess(type, email);
     }
 }

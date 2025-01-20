@@ -26,14 +26,16 @@ public final class UpgradePlan extends DefaultTransaction {
         Account acc = bank.getAccountWithIBAN(account);
         String currentPlan = bank.getEntryWithIBAN(account).getPlan();
         if (!bank.getUpgradeMap().containsKey(currentPlan + "-" + newPlanType)) {
-            // Can't upgrade
+            if (newPlanType.equals(currentPlan)) {
+                details.add("description", "The user already has the " + newPlanType + " plan.");
+            }
             return;
         }
         double amount = bank.getUpgradeMap().get(currentPlan + "-" + newPlanType)
                         * bank.getExchangeRate("RON", acc.getCurrency());
         double totalAmount = bank.getTotalPrice(amount, acc.getCurrency(), bank.getEntryWithIBAN(account).getUser().getEmail());
         if (acc.getBalance() <amount) {
-            // not enough funds
+            details.add("description", "Insufficient funds");
             return;
         }
         details.add("description", "Upgrade plan");
@@ -51,6 +53,15 @@ public final class UpgradePlan extends DefaultTransaction {
         }
 
         return "ok";
+    }
+
+    @Override
+    public boolean hasLoggableError() {
+        if (verify().equals("Account not found")) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -82,5 +93,10 @@ public final class UpgradePlan extends DefaultTransaction {
         bank.getEntryWithIBAN(account).setPlan(newPlanType);
         acc.setBalance(acc.getBalance() - amount);
         //System.out.println("Upgraded from " + currentPlan + " to " + newPlanType + " for " + totalAmount);
+    }
+
+    @Override
+    public String getAccount() {
+        return account;
     }
 }

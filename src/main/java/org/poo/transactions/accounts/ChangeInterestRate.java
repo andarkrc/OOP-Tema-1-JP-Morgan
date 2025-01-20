@@ -67,4 +67,9 @@ public final class ChangeInterestRate extends DefaultTransaction {
 
         bank.addTransaction(bank.getEntryWithIBAN(account).getUser().getEmail(), this);
     }
+
+    @Override
+    public String getAccount() {
+        return account;
+    }
 }

@@ -34,6 +34,12 @@ public final class PrintTransactions extends DefaultTransaction {
         JsonArray transactions = new JsonArray();
         for (DefaultTransaction transaction : bank.getEntryWithEmail(email).
                                                    getTransactionHistory()) {
+            if (transaction.getCommandName().equals("addFunds")) {
+                continue;
+                // THIS IS INSANITY MY BROTHERS
+                // WHY DO YOU WANT ME TO REMEMBER A TRANSACTION JUST FOR BUSINESS REPORTS
+                // WHY WOULDN'T I WANNA SEE WHEN I ADD FUNDS TO MY ACCOUNT
+            }
             transactions.add(transaction.getDetails());
         }
         command.add("output", transactions);

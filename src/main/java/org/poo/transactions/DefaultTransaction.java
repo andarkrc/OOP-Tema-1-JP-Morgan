@@ -95,6 +95,15 @@ public abstract class DefaultTransaction implements Visitable {
     }
 
     /**
+     * Returns the associated email of the user who initiated the transaction.
+     *
+     * @return          the email of the user who made the transaction
+     */
+    public String getEmail() {
+        return "";
+    }
+
+    /**
      * Returns whether the transaction should appear in a spendings report.
      * In an ideal world, this should be always true.
      *

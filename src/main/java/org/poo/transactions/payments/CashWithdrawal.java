@@ -2,9 +2,12 @@ package org.poo.transactions.payments;
 
 import org.poo.bank.Bank;
 import org.poo.bank.accounts.Account;
+import org.poo.bank.cards.Card;
 import org.poo.fileio.CommandInput;
 import org.poo.jsonobject.JsonObject;
 import org.poo.transactions.DefaultTransaction;
+import org.poo.transactions.cards.CreateOneTimeCard;
+import org.poo.transactions.cards.DeleteCard;
 
 public class CashWithdrawal extends DefaultTransaction {
     private String email;
@@ -63,7 +66,7 @@ public class CashWithdrawal extends DefaultTransaction {
 
         Account acc = bank.getAccountWithCard(cardNumber);
         double actualAmount = amount * bank.getExchangeRate("RON", acc.getCurrency());
-        double totalAmount = bank.getTotalPrice(actualAmount, acc.getCurrency(), email);
+        double totalAmount = bank.getTotalPrice(actualAmount, acc.getCurrency(), acc.getIban());
 
         if (acc.getBalance() < totalAmount) {
             details.add("description", "Insufficient funds");
@@ -81,9 +84,9 @@ public class CashWithdrawal extends DefaultTransaction {
         }
         Account acc = bank.getAccountWithCard(cardNumber);
         double actualAmount = amount * bank.getExchangeRate("RON", acc.getCurrency());
-        double totalAmount = bank.getTotalPrice(actualAmount, acc.getCurrency(), email);
-
-        if (bank.getCard(cardNumber).getStatus().equals("frozen")) {
+        double totalAmount = bank.getTotalPrice(actualAmount, acc.getCurrency(), acc.getIban());
+        Card card = bank.getCard(cardNumber);
+        if (card.getStatus().equals("frozen")) {
             //card is frozen
             return;
         }
@@ -99,5 +102,17 @@ public class CashWithdrawal extends DefaultTransaction {
         }
 
         acc.setBalance(acc.getBalance() - totalAmount);
+        /*
+        if (card.isOneTime()) {
+            DefaultTransaction deleteCard = new DeleteCard(this, cardNumber);
+            deleteCard.burnDetails();
+            deleteCard.remember();
+            deleteCard.execute();
+            DefaultTransaction createCard = new CreateOneTimeCard(this, acc.getIban());
+            createCard.burnDetails();
+            createCard.remember();
+            createCard.execute();
+        }
+        */
     }
 }

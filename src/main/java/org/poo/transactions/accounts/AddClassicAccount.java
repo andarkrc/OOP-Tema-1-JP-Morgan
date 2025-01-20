@@ -4,6 +4,7 @@ import org.poo.bank.accounts.ClassicAccount;
 import org.poo.bank.Bank;
 import org.poo.bank.accounts.Account;
 import org.poo.fileio.CommandInput;
+import org.poo.utils.Constants;
 
 public final class AddClassicAccount extends AddAccount {
     public AddClassicAccount(final CommandInput input, final Bank bank) {
@@ -20,6 +21,7 @@ public final class AddClassicAccount extends AddAccount {
         account.setAccountType(accountType)
                 .setCurrency(currency)
                 .setIban(iban);
+        account.addPermission(email, Constants.OWNER_LEVEL);
         bank.addAccount(email, account);
     }
 }

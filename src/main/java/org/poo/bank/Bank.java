@@ -14,6 +14,7 @@ import org.poo.fileio.UserInput;
 import org.poo.jsonobject.JsonArray;
 import org.poo.transactions.DefaultTransaction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ public final class Bank {
     private Map<String, Commerciant> commerciants;
     @Getter
     private SplitPaymentContainer splitPayments;
+    private List<String> validUsers;
 
     private Bank() {
 
@@ -53,6 +55,16 @@ public final class Bank {
      */
     public boolean databaseHas(final String key) {
         return database.hasKey(key);
+    }
+
+    /**
+     * Checks if the provided email is of a valid user.
+     *
+     * @param email     email to check
+     * @return
+     */
+    public boolean isValidUser(final String email) {
+        return validUsers.contains(email);
     }
 
     /**
@@ -83,6 +95,7 @@ public final class Bank {
      */
     public void addUser(final UserInput input) {
         database.addUser(new User(input));
+        validUsers.add(input.getEmail());
     }
 
     /**
@@ -265,7 +278,8 @@ public final class Bank {
         return map;
     }
 
-    public double getTotalPrice(double price, String currency, String email) {
+    public double getTotalPrice(double price, String currency, String account) {
+        String email = getEntryWithIBAN(account).getUser().getEmail();
         String plan = getEntryWithEmail(email).getPlan();
         double local_price = price * exchange.getRate(currency, "RON");
         switch (plan) {
@@ -303,14 +317,16 @@ public final class Bank {
     private double spendingThresholdCashback(double price, String currency, String account, String commerciant) {
         List<DefaultTransaction> transactions =
                 getEntryWithIBAN(account).getTransactionHistory().stream()
-                        .filter(e -> e.getAccount().equals(account)).toList();
+                        .filter(e -> e.getAccount().equals(account))
+                        .filter(e -> !e.getDetails().getStringOfField("description").equals("Insufficient funds"))
+                        .toList();
         double totalSum = 0.0;
         String accountPlan = getEntryWithIBAN(account).getPlan();
-        String commerciantType = commerciants.get(commerciant).getType();
+        String commerciantType = commerciants.get(commerciant).getCashbackStrategy();
         for (DefaultTransaction transaction : transactions) {
             String comm = transaction.getDetails().getStringOfField("commerciant");
             if (!comm.isEmpty()) {
-                if (commerciants.get(comm).getType().equals(commerciantType)) {
+                if (commerciants.get(comm).getCashbackStrategy().equals(commerciantType)) {
                     String curr = getAccountWithIBAN(account).getCurrency();
                     double amount = transaction.getDetails().getDoubleOfField("amount");
                     totalSum += amount * exchange.getRate(curr, "RON");
@@ -319,9 +335,9 @@ public final class Bank {
                 String rec = transaction.getDetails().getStringOfField("receiver");
                 if (!rec.isEmpty()) {
                     if (commerciants.containsKey(rec)) {
-                        if (commerciants.get(rec).getType().equals(commerciantType)) {
-                        double amount = transaction.getDetails().getDoubleOfField("amount");
-                        totalSum += amount;
+                        if (commerciants.get(rec).getCashbackStrategy().equals(commerciantType)) {
+                            String amount = transaction.getDetails().getStringOfField("amount");
+                            totalSum += Double.parseDouble(amount.split(" ")[0]);
                         }
                     }
                 }
@@ -346,10 +362,18 @@ public final class Bank {
         return 0.0;
     }
 
+    private double applyCoupon(double price, String account, String commerciant) {
+
+    }
+
     public double getCashBack(double price, String currency, String account, String commerciant) {
         switch (commerciants.get(commerciant).getCashbackStrategy()) {
             case "spendingThreshold" -> {
                 return spendingThresholdCashback(price, currency, account, commerciant);
+            }
+
+            case "nrOfTransactions" -> {
+                return applyCoupon(price, account, commerciant);
             }
 
             default -> {
@@ -388,5 +412,6 @@ public final class Bank {
             commerciants.put(com.getName(), com);
         }
         splitPayments = new SplitPaymentContainer();
+        validUsers = new ArrayList<>();
     }
 }

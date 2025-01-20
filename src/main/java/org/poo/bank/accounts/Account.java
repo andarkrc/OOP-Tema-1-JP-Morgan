@@ -3,6 +3,8 @@ package org.poo.bank.accounts;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.bank.cards.Card;
+import org.poo.bank.commerciants.DiscountCoupon;
+import org.poo.utils.Constants;
 import org.poo.visitors.Visitable;
 import org.poo.visitors.Visitor;
 
@@ -21,12 +23,25 @@ public abstract class Account implements Visitable {
     protected List<Card> cards;
     protected Map<String, Card> cardsMap;
     protected double minBalance;
+    protected double spendingLimit;
+    protected double depositLimit;
+    protected List<String> associates;
+    protected Map<String, Integer> permissions;
+
+    protected List<DiscountCoupon> availableCoupons;
+    protected List<DiscountCoupon> usableCoupons;
 
     public Account() {
         balance = 0;
         cards = new ArrayList<>();
         cardsMap = new HashMap<>();
+        associates = new ArrayList<>();
+        permissions = new HashMap<>();
+        availableCoupons = new ArrayList<>();
+        usableCoupons = new ArrayList<>();
         minBalance = 0;
+        spendingLimit = Constants.NO_SPENDING_LIMIT;
+        depositLimit = Constants.NO_DEPOSIT_LIMIT;
     }
 
     /**
@@ -38,10 +53,20 @@ public abstract class Account implements Visitable {
         return false;
     }
 
+    /**
+     * Returns whether the account is a classic account or not.
+     *
+     * @return
+     */
     public boolean isClassic() {
         return false;
     }
 
+    /**
+     * Returns whether the account is a business account or not.
+     *
+     * @return
+     */
     public boolean isBusiness() {
         return false;
     }
@@ -86,6 +111,45 @@ public abstract class Account implements Visitable {
     }
 
     /**
+     * Adds the specified permission level for the user.
+     *
+     * @param email     the user who was granted the permission
+     * @param level     the permission level granted
+     */
+    public void addPermission(final String email, final int level) {
+        associates.add(email);
+        permissions.put(email, level);
+    }
+
+    /**
+     * Returns the permission level of the specified user.
+     *
+     * @param email     user
+     * @return          permission level:
+     *                  0 - no permission
+     *                  1 - can spend and deposit within limit
+     *                      creates cards
+     *                  2 - can also delete cards
+     *                  3 - can also set limits (every permission)
+     */
+    public Integer getPermission(final String email) {
+        if (!permissions.containsKey(email)) {
+            return Constants.NO_LEVEL;
+        }
+        return permissions.get(email);
+    }
+
+    /**
+     * Removes the permission for the specified user.
+     *
+     * @param email
+     */
+    public void removePermission(final String email) {
+        associates.remove(email);
+        permissions.remove(email);
+    }
+
+    /**
      * Sets the account's currency to the specified currency.
      *
      * @param newCurrency
@@ -93,6 +157,28 @@ public abstract class Account implements Visitable {
      */
     public Account setCurrency(final String newCurrency) {
         this.currency = newCurrency;
+        return this;
+    }
+
+    /**
+     * Sets the account's spending limit to the specified limit.
+     *
+     * @param newSpendingLimit
+     * @return                      the current account
+     */
+    public Account setSpendingLimit(final double newSpendingLimit) {
+        this.spendingLimit = newSpendingLimit;
+        return this;
+    }
+
+    /**
+     * Sets the account's deposit limit to the specified limit.
+     *
+     * @param newDepositLimit
+     * @return                  the current account
+     */
+    public Account setDepositLimit(final double newDepositLimit) {
+        this.depositLimit = newDepositLimit;
         return this;
     }
 
